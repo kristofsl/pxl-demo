@@ -1,0 +1,10 @@
+# Topic 4 — Conformal predictions: betrouwbaarheid met garantie
+# Installeren:  python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+
+numpy>=1.26
+pandas>=2.1
+scikit-learn>=1.4
+matplotlib>=3.8
+
+jupyterlab>=4.1
+ipywidgets>=8.1

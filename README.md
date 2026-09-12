@@ -11,6 +11,7 @@ ander breken, en kan een student één map downloaden en meteen aan de slag.
 | 1 | [`01-explainable-ai/`](01-explainable-ai/) | Een predictie verklaren met **SHAP** en **LIME** op tabulaire data | shap · lime · scikit-learn |
 | 2 | [`02-autoencoders/`](02-autoencoders/) | **Anomaliedetectie**: fraude opsporen met een autoencoder, zonder ooit een fraudelabel te leren | torch · scikit-learn |
 | 3 | [`03-gezichtsherkenning/`](03-gezichtsherkenning/) | **Transfer learning** en **contrastive learning**: gezichtsherkenning op FaceNet-embeddings, met eigen Keras-modellen | keras · tensorflow · mtcnn |
+| 4 | [`04-conformal-predictions/`](04-conformal-predictions/) | **Conformal prediction**: voorspellingen met een garantie die je kunt natellen, en een werkstroom mens-versus-machine | scikit-learn |
 
 ## Snel starten
 
