@@ -61,11 +61,11 @@ opnieuw: je wordt dan gewoon persoon 17.
 | § | Onderwerp |
 |---|---|
 | 1–2 | De foto's, en **MTCNN**: bounding boxes, landmarks, en hoeveel gezichten hij mist |
-| **3** | **FaceNet**: van gezicht naar 512 getallen — dit is de transfer learning |
+| **3** | **FaceNet**: van gezicht naar 512 getallen — uitgetekend, met de embedding van drie foto's naast elkaar |
 | 4 | De embeddingruimte verkennen: afstanden, histogram, 2D-projectie |
 | **5** | **Ons eigen classifiermodel** in Keras — plus: hoeveel foto's heb je nodig? |
-| **6** | **Contrastive learning**: triplet loss, zelf geschreven, siamees netwerk |
-| **7** | **De pairwise vergelijker**: laat het model de meetlat zélf leren |
+| **6** | **Contrastive learning**: triplet loss, zelf geschreven — mét een tekening van de siamese architectuur |
+| **7** | **De pairwise vergelijker**: laat het model de meetlat zélf leren — ook uitgetekend |
 | 8 | Je eigen foto door de hele pijplijn |
 
 ### De rode draad
@@ -103,6 +103,12 @@ Verificatie (zijn dit twee foto's van dezelfde persoon?), AUC:
   krijgt (zonnebril, profiel, slecht licht) en test het met eigen foto's.
 - **§5** — de few-shot-curve. Eén foto per persoon en je zit boven de 90%. Vraag de klas te
   schatten hoeveel foto's een netwerk vanaf nul nodig zou hebben.
+- **§3** — de tekening van de embedding: één gezicht, één streepjespatroon van 512 getallen.
+  Daaronder drie foto's naast elkaar (twee keer dezelfde persoon, één keer iemand anders) zodat
+  studenten zelf zien dat het patroon overeenkomt. Dat maakt "embedding" concreet.
+- **§6** — de architectuurtekening. Grijs is bevroren (FaceNet), oranje leert (ons hoofd), en
+  de streepjeslijn eromheen zegt: dit is **één** netwerk, drie keer gebruikt. Vraag de klas
+  waarom die gewichten gedeeld moeten zijn. Antwoord: anders meet je met drie meetlatten.
 - **§6** — de tekening van triplet loss (trekken en duwen) en de verliesfunctie die we zelf
   schrijven. Merk op dat het verlies naar nul zakt: de meeste triplets zijn te makkelijk.
   Dat is de opstap naar *hard negative mining*.

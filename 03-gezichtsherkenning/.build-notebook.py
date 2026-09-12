@@ -280,6 +280,74 @@ print(embeddings[0][:8].round(4))
 """)
 
 md(r"""
+### Even kijken wat dat nu eigenlijk is
+
+Een embedding blijft abstract zolang je er niet naar kijkt. Dus: één gezicht, en wat FaceNet
+ervan maakt.
+""")
+
+code(r"""
+k = 0
+fig = plt.figure(figsize=(12, 3.2))
+
+# --- links: de foto die erin gaat ---
+a1 = fig.add_axes([0.02, 0.15, 0.16, 0.7])
+a1.imshow(gezichten[k]); a1.axis("off")
+a1.set_title("het gezicht", fontsize=10)
+
+# --- midden: het netwerk als doos ---
+a2 = fig.add_axes([0.22, 0.15, 0.16, 0.7])
+a2.add_patch(plt.Rectangle((0.1, 0.25), 0.8, 0.5, facecolor="#4C72B0", alpha=0.85))
+a2.text(0.5, 0.5, "FaceNet", ha="center", va="center", color="white",
+        fontsize=12, fontweight="bold")
+a2.text(0.5, 0.13, "voorgetraind op\nmiljoenen gezichten", ha="center", fontsize=8, color="0.3")
+a2.set_xlim(0, 1); a2.set_ylim(0, 1); a2.axis("off")
+
+# --- rechts: de 512 getallen ---
+a3 = fig.add_axes([0.44, 0.3, 0.54, 0.4])
+a3.imshow(embeddings[k].reshape(1, -1), aspect="auto", cmap="RdBu_r", vmin=-0.15, vmax=0.15)
+a3.set_yticks([]); a3.set_xlabel("de 512 getallen van deze ene foto", fontsize=9)
+a3.set_title("de embedding", fontsize=10)
+
+for x in (0.19, 0.40):
+    fig.text(x, 0.5, "→", fontsize=22, ha="center", va="center", color="0.4")
+
+plt.show()
+
+print(f"De eerste acht getallen: {embeddings[k][:8].round(3)}")
+print(f"De hele vector heeft lengte {np.linalg.norm(embeddings[k]):.2f}.")
+print()
+print("Rood is positief, blauw is negatief. Wat die getallen afzonderlijk betekenen,")
+print("weet niemand - ook de makers van FaceNet niet. En dat hoeft ook niet:")
+print("het enige wat telt is dat twee foto's van dezelfde persoon een SOORTGELIJK")
+print("patroon krijgen, en twee verschillende mensen een ander patroon.")
+""")
+
+code(r"""
+# Datzelfde patroon, voor drie foto's naast elkaar: twee keer dezelfde persoon,
+# en iemand anders.
+persoon = labels[0]
+zelfde = np.where(labels == persoon)[0][:2]
+ander  = np.where(labels != persoon)[0][0]
+drie   = [zelfde[0], zelfde[1], ander]
+
+fig, assen = plt.subplots(3, 2, figsize=(11, 4.2),
+                          gridspec_kw={"width_ratios": [1, 6]})
+for rij, k in enumerate(drie):
+    assen[rij, 0].imshow(gezichten[k]); assen[rij, 0].axis("off")
+    assen[rij, 0].set_title(labels[k], fontsize=8)
+    assen[rij, 1].imshow(embeddings[k].reshape(1, -1), aspect="auto",
+                         cmap="RdBu_r", vmin=-0.15, vmax=0.15)
+    assen[rij, 1].set_yticks([]); assen[rij, 1].set_xticks([])
+fig.suptitle("Bovenste twee: dezelfde persoon. Onderste: iemand anders.", fontsize=10)
+plt.tight_layout()
+plt.show()
+
+print("Kijk naar de strepen: de bovenste twee lijken op elkaar, de onderste wijkt af.")
+print("Meer is een embedding niet - en precies daarom kun je er verderop mee rekenen.")
+""")
+
+md(r"""
 ---
 
 ## 4. De embeddingruimte verkennen
@@ -628,14 +696,92 @@ def triplet_verlies(marge=0.3):
 """)
 
 md(r"""
-### Het model: één hoofd, drie ingangen
+### Het model: één netwerk, drie keer gebruikt
 
-Hier zit de elegantie van een siamees netwerk. We bouwen **één** klein netwerk — het
-*projectiehoofd* — en sturen alle drie de foto's er doorheen. Dezelfde gewichten, drie keer
-gebruikt.
+Nu komt het woord dat je overal tegenkomt: een **siamees netwerk**. Dat klinkt ingewikkelder
+dan het is.
 
-Het hoofd perst de 512 getallen van FaceNet samen tot 64, en normaliseert die weer naar
-lengte 1 zodat we dezelfde afstandsmaat kunnen blijven gebruiken.
+We bouwen **één** klein netwerk — we noemen het het *projectiehoofd* — en sturen alle drie de
+foto's daar doorheen. Niet drie netwerken. Eén netwerk, drie keer gebruikt. Vandaar "siamees":
+het zijn identieke kopieën die aan elkaar vastzitten.
+
+**Waarom dat moet:** stel dat je voor het anker een ander netwerk zou gebruiken dan voor de
+positief. Dan komen hun uitkomsten uit twee verschillende meetlatten, en is "afstand tussen
+die twee" een betekenisloos getal. Je wil één meetlat. Dus: dezelfde gewichten voor alle drie.
+
+En omdat het één netwerk is, leert het ook maar één keer. Wat het bij het anker opsteekt,
+gebruikt het meteen bij de negatief.
+""")
+
+code(r"""
+# De architectuur, uitgetekend.
+fig, ax = plt.subplots(figsize=(12, 4.6))
+
+rollen = [("anker",    "#4C72B0", 3.1),
+          ("positief", "#2E8B57", 1.7),
+          ("negatief", "#C44E52", 0.3)]
+voorbeelden = {"anker": zelfde[0], "positief": zelfde[1], "negatief": ander}
+
+for naam, kleur, y in rollen:
+    # het gezicht
+    ax.imshow(gezichten[voorbeelden[naam]], extent=(0.0, 0.95, y, y + 0.95), aspect="auto")
+    ax.text(0.47, y - 0.16, naam, ha="center", fontsize=10, color=kleur, fontweight="bold")
+
+    # pijl naar het netwerk
+    ax.arrow(1.05, y + 0.47, 0.5, 0, head_width=0.1, color="0.4", length_includes_head=True)
+
+    # FaceNet (grijs: die ligt vast)
+    ax.add_patch(plt.Rectangle((1.65, y + 0.1), 1.2, 0.75, facecolor="0.82",
+                               edgecolor="0.5", lw=1.2))
+    ax.text(2.25, y + 0.47, "FaceNet", ha="center", va="center", fontsize=9, color="0.25")
+
+    ax.arrow(2.95, y + 0.47, 0.45, 0, head_width=0.1, color="0.4", length_includes_head=True)
+
+    # het projectiehoofd (gekleurd: dit trainen we)
+    ax.add_patch(plt.Rectangle((3.5, y + 0.1), 1.5, 0.75, facecolor="#DD8452",
+                               alpha=0.85, edgecolor="black", lw=1.2))
+    ax.text(4.25, y + 0.47, "projectie-\nhoofd", ha="center", va="center",
+            fontsize=9, color="white", fontweight="bold")
+
+    ax.arrow(5.1, y + 0.47, 0.45, 0, head_width=0.1, color="0.4", length_includes_head=True)
+    ax.add_patch(plt.Rectangle((5.65, y + 0.25), 0.45, 0.45, facecolor=kleur, alpha=0.9))
+
+# het kader dat zegt: dit is ÉÉN netwerk
+ax.add_patch(plt.Rectangle((3.38, 0.28), 1.74, 3.6, fill=False, ec="#DD8452",
+                           lw=2.5, ls="--"))
+ax.text(4.25, 4.02, "ÉÉN netwerk — dezelfde gewichten", ha="center",
+        fontsize=10, color="#DD8452", fontweight="bold")
+
+# de verliesfunctie
+ax.add_patch(plt.Rectangle((6.6, 0.9), 2.2, 2.4, facecolor="#4C72B0", alpha=0.12,
+                           edgecolor="#4C72B0", lw=2))
+ax.text(7.7, 2.95, "triplet loss", ha="center", fontsize=11, fontweight="bold",
+        color="#4C72B0")
+ax.annotate("", xy=(6.55, 3.0), xytext=(6.15, 3.57),
+            arrowprops=dict(arrowstyle="->", color="0.4"))
+ax.annotate("", xy=(6.55, 2.2), xytext=(6.15, 2.17),
+            arrowprops=dict(arrowstyle="->", color="0.4"))
+ax.annotate("", xy=(6.55, 1.4), xytext=(6.15, 0.77),
+            arrowprops=dict(arrowstyle="->", color="0.4"))
+ax.text(7.7, 2.3, "trek anker en positief\nnaar elkaar toe", ha="center",
+        fontsize=8.5, color="#2E8B57")
+ax.text(7.7, 1.4, "duw anker en negatief\nuit elkaar", ha="center",
+        fontsize=8.5, color="#C44E52")
+
+ax.set_xlim(-0.2, 9.1); ax.set_ylim(-0.4, 4.4); ax.axis("off")
+ax.set_title("Een siamees netwerk: drie foto's, één gedeeld projectiehoofd", fontsize=12)
+plt.tight_layout()
+plt.show()
+""")
+
+md(r"""
+Let op de twee kleuren in die tekening:
+
+- **Grijs (FaceNet)** ligt vast. Daar veranderen we niets aan — dat is de transfer learning.
+- **Oranje (het projectiehoofd)** is van ons, en dat is het enige wat leert.
+
+Het hoofd perst de 512 getallen van FaceNet samen tot 64 en normaliseert die weer naar
+lengte 1, zodat we dezelfde afstandsmaat kunnen blijven gebruiken als in §4.
 """)
 
 code(r"""
@@ -798,6 +944,58 @@ daarom twee combinaties die **symmetrisch** zijn:
 | `a * b` | het product per getal | waar zijn ze het juist eens? |
 
 Samen 1024 getallen, en of je nu `(a, b)` of `(b, a)` invoert maakt niets uit.
+""")
+
+code(r"""
+# Ook deze architectuur even uittekenen, naast die van hierboven.
+fig, ax = plt.subplots(figsize=(12, 3.8))
+
+for naam, y in [("gezicht A", 1.85), ("gezicht B", 0.35)]:
+    k = zelfde[0] if naam.endswith("A") else zelfde[1]   # twee foto's van dezelfde persoon
+    ax.imshow(gezichten[k], extent=(0.0, 0.95, y, y + 0.95), aspect="auto")
+    ax.text(0.47, y - 0.17, naam, ha="center", fontsize=10, fontweight="bold", color="#4C72B0")
+    ax.arrow(1.05, y + 0.47, 0.45, 0, head_width=0.09, color="0.4", length_includes_head=True)
+    ax.add_patch(plt.Rectangle((1.6, y + 0.12), 1.1, 0.7, facecolor="0.82",
+                               edgecolor="0.5", lw=1.2))
+    ax.text(2.15, y + 0.47, "FaceNet", ha="center", va="center", fontsize=9, color="0.25")
+    ax.arrow(2.8, y + 0.47, 0.4, 0, head_width=0.09, color="0.4", length_includes_head=True)
+    ax.add_patch(plt.Rectangle((3.3, y + 0.27), 0.4, 0.4, facecolor="#4C72B0", alpha=0.9))
+
+# combineren
+ax.add_patch(plt.Rectangle((4.0, 0.75), 1.5, 1.75, facecolor="#2E8B57", alpha=0.15,
+                           edgecolor="#2E8B57", lw=2))
+ax.text(4.75, 2.2, "combineren", ha="center", fontsize=10, fontweight="bold", color="#2E8B57")
+ax.text(4.75, 1.62, "| a − b |", ha="center", fontsize=11)
+ax.text(4.75, 1.3, "waar verschillen ze?", ha="center", fontsize=7.5, color="0.35")
+ax.text(4.75, 1.05, "a × b", ha="center", fontsize=11)
+ax.text(4.75, 0.85, "waar lijken ze?", ha="center", fontsize=7.5, color="0.35")
+for y in (2.32, 0.82):
+    ax.annotate("", xy=(3.95, 1.6), xytext=(3.75, y),
+                arrowprops=dict(arrowstyle="->", color="0.4"))
+
+ax.arrow(5.6, 1.6, 0.4, 0, head_width=0.09, color="0.4", length_includes_head=True)
+ax.add_patch(plt.Rectangle((6.1, 1.05), 1.4, 1.1, facecolor="#DD8452", alpha=0.85,
+                           edgecolor="black", lw=1.2))
+ax.text(6.8, 1.6, "klein\nnetwerk", ha="center", va="center", fontsize=9,
+        color="white", fontweight="bold")
+ax.arrow(7.6, 1.6, 0.4, 0, head_width=0.09, color="0.4", length_includes_head=True)
+ax.text(8.9, 1.6, "0.92", ha="center", va="center", fontsize=16, fontweight="bold",
+        color="#2E8B57")
+ax.text(8.9, 1.1, "kans dat dit\ndezelfde persoon is", ha="center", fontsize=8.5, color="0.35")
+
+ax.set_xlim(-0.2, 9.9); ax.set_ylim(-0.45, 2.95); ax.axis("off")
+ax.set_title("De vergelijker: twee gezichten in, één getal uit", fontsize=12)
+plt.tight_layout()
+plt.show()
+""")
+
+md(r"""
+Zie je het verschil met de vorige tekening? Daar kwamen er aan het eind **drie vectoren** uit
+en berekenden we zelf de afstanden. Hier komt er één **getal** uit, en dat getal ís het
+antwoord.
+
+Dat lijkt handiger, en voor één vergelijking is het dat ook. Maar er zit een addertje onder het
+gras dat je pas ziet als je gaat opschalen — dat bespreken we zo.
 """)
 
 code(r"""
