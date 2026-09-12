@@ -1,0 +1,19 @@
+# virtual environments per topic
+*/.venv/
+.venv/
+
+# Jupyter
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# macOS
+.DS_Store
+
+# editor-restanden
+*.swp
+*.swo
+*~

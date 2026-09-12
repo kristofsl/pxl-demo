@@ -1,0 +1,23 @@
+# Topic 3 — Gezichtsherkenning: transfer learning en contrastive learning
+# Installeren:  python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+
+# --- data ---
+numpy>=1.26
+pandas>=2.1
+pillow>=10
+scikit-learn>=1.4      # alleen voor de LFW-download en de evaluatiematen
+
+# --- de voorgetrainde modellen die we lenen ---
+mtcnn>=1.0.0           # gezichtsdetectie (bounding boxes + landmarks)
+keras-facenet>=0.3.2   # FaceNet-embeddings
+
+# --- onze eigen modellen ---
+tensorflow>=2.20       # backend voor Keras 3
+keras>=3.5
+
+# --- visualisatie ---
+matplotlib>=3.8
+
+# --- notebook-omgeving ---
+jupyterlab>=4.1
+ipywidgets>=8.1

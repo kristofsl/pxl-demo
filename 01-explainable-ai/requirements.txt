@@ -1,0 +1,20 @@
+# Topic 1 — Explainable AI (SHAP · LIME)
+# Installeren:  python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+
+# --- data & modellen ---
+numpy>=1.26
+pandas>=2.1
+scikit-learn>=1.4
+
+# --- explainability ---
+shap>=0.45          # methode 1: SHAP-waarden (Shapley values)
+lime>=0.2.0.1       # methode 2: lokale surrogaatmodellen
+
+# --- visualisatie ---
+matplotlib>=3.8
+
+# --- notebook-omgeving ---
+jupyterlab>=4.1
+ipywidgets>=8.1     # interactieve widgets (o.a. voor shap force plots)
+
+# De notebook in archief/ heeft daarnaast torch en captum nodig; zie archief/README.md.
