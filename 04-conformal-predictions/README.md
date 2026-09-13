@@ -45,7 +45,7 @@ Daarna heeft de notebook geen internet meer nodig.
 | 1 | De data, en de **drie**-weg-split: train · kalibratie · test |
 | 2 | Waarom "97% zeker" van een softmax geen garantie is |
 | **3** | **Conformal in vier stappen** — meten, sorteren, grens, toepassen (met tekening) |
-| **4** | **Klopt de garantie?** Beloofd versus gemeten, bij vier niveaus |
+| **4** | **Klopt de garantie?** Beloofd versus gemeten, bij vier niveaus — en waarom 94,8% géén mislukking is |
 | **5** | **De werkstroom**: wat automatiseren we, en wat gaat naar een mens? |
 | 6 | Waar twijfelt het model over? De verwarringsparen, in beeld |
 
@@ -81,6 +81,10 @@ de cijfers die een mens ook door elkaar haalt.
   één antwoord.
 - **§4** — beloofd naast gemeten, bij vier niveaus. Dit is het moment waarop conformal van
   "aardig idee" naar "dit werkt gewoon" gaat.
+- **§4 slot** — de vraag die altijd komt: "94,8% is toch minder dan 95%?" De notebook meet het
+  met veertig verschillende kalibratiesets: het gemiddelde landt op 94,99% en ruim de helft van
+  de runs zit onder het doel. Dát is wat *marginale* dekking betekent, en het is de meest
+  gemaakte denkfout bij conformal prediction.
 - **§5** — de werkstroomtabel. Laat de klas een rij kiezen alsof zij de afdeling runnen. Wat
   kost een fout, en wat kost een mens die meekijkt? Dat is geen technische vraag.
 - **§6** — de plaatjes van de twijfelgevallen. Laat studenten zelf kijken of ze het met de
@@ -102,7 +106,8 @@ de cijfers die een mens ook door elkaar haalt.
 |---|---|
 | `FileNotFoundError: Data niet gevonden` | Je bent `haal_data.py` vergeten. Zie stap 1. |
 | `ModuleNotFoundError` | Je draait de systeem-Jupyter. Start via `.venv/bin/jupyter lab`. |
-| Dekking wijkt een paar tienden af | Normaal. De garantie geldt gemiddeld over kalibratiesets, niet exact per stuk. |
+| Dekking wijkt een paar tienden af | Normaal, en §4 meet het na: gemiddeld over 40 kalibratiesets komt het op 94,99% uit. |
+| `ValueError: te weinig kalibratiepunten` | Geen bug: met n punten kun je geen garantie van meer dan ongeveer 1 − 1/n geven. Kies een lagere garantie of een grotere kalibratieset. |
 | Lege verzamelingen | Geen fout: geen enkel label komt door de keuring. Zie de uitleg in §4. |
 
 ## Getest met

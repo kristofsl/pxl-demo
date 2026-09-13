@@ -150,8 +150,14 @@ zekerheid = kansen.max(axis=1)
 voorspelling = kansen.argmax(axis=1)
 klopt = voorspelling == y_test
 
+# Let op de ondergrens. Bij tien klassen kan de hoogste kans nooit onder de 10%
+# liggen: de tien kansen tellen op tot 1, dus de grootste is minstens 1/10.
+# Er bestaat hier ook geen binaire drempel van 50% - het model kiest altijd de
+# hoogste van tien kansen, ook als die maar 0.21 is.
+ondergrens = 1 / kansen.shape[1]
+
 rijen = []
-for laag, hoog in [(0.0, 0.5), (0.5, 0.7), (0.7, 0.9), (0.9, 0.99), (0.99, 1.01)]:
+for laag, hoog in [(ondergrens, 0.5), (0.5, 0.7), (0.7, 0.9), (0.9, 0.99), (0.99, 1.01)]:
     groep = (zekerheid >= laag) & (zekerheid < hoog)
     if groep.sum() < 20:
         continue
@@ -162,6 +168,11 @@ for laag, hoog in [(0.0, 0.5), (0.5, 0.7), (0.7, 0.9), (0.9, 0.99), (0.99, 1.01)
     })
 display(pd.DataFrame(rijen).set_index("model zegt"))
 
+print(f"De laagste topkans in de hele testset is {zekerheid.min():.2f}.")
+print(f"Bij {(zekerheid < 0.5).mean():.1%} van de cijfers blijft de beste gok onder de 50%,")
+print(f"en daar klopt er {(klopt[zekerheid < 0.5]).mean():.0%}. Die worden gewoon voorspeld -")
+print("een model met tien klassen kent geen 'ja/nee'-grens bij 0.5.")
+print()
 print("Dit model valt nog mee: de percentages liggen in de buurt van wat het belooft.")
 print("Maar let op wat er ontbreekt: nergens staat een GARANTIE. Dat dit vandaag klopt,")
 print("zegt niets over morgen, en het zegt al helemaal niets over één losse voorspelling.")
@@ -258,6 +269,19 @@ code(r"""
 def bepaal_grens(scores, alpha):
     # alpha = hoeveel fouten je accepteert. alpha=0.05 -> 95% garantie.
     n = len(scores)
+
+    # Een garantie kan niet scherper zijn dan je kalibratieset toelaat. Met n punten
+    # is de strengste zinnige grens "alles behalve de slechtste", en dat komt neer
+    # op minstens 1/alpha - 1 punten. Met 50 punten is 99% dus onmogelijk: je hebt
+    # simpelweg geen enkele score die zeldzaam genoeg is om die grens te trekken.
+    minimaal = int(np.ceil(1 / alpha)) - 1
+    if n < minimaal:
+        raise ValueError(
+            f"{n} kalibratiepunten is te weinig voor een garantie van {1 - alpha:.0%}. "
+            f"Je hebt er minstens {minimaal} nodig. Kies een lagere garantie, "
+            f"of maak de kalibratieset groter."
+        )
+
     niveau = np.ceil((n + 1) * (1 - alpha)) / n
     return np.quantile(scores, niveau, method="higher")
 
@@ -270,6 +294,14 @@ print(f"grens            : {grens:.4f}")
 print()
 print(f"Vertaald: een label komt in de verzameling als het model er minstens")
 print(f"{1 - grens:.1%} kans aan geeft.")
+
+# En wat als je kalibratieset te klein is voor de garantie die je vraagt?
+try:
+    bepaal_grens(score[:50], 0.01)
+except ValueError as fout:
+    print()
+    print("Probeer je 99% garantie te halen uit 50 kalibratiepunten:")
+    print(f"  {fout}")
 """)
 
 md(r"""
@@ -371,8 +403,59 @@ plt.tight_layout(); plt.show()
 """)
 
 md(r"""
----
+### "Maar 94,8% is toch minder dan 95%?"
 
+Goed opgemerkt, en dit is precies de plek waar de meeste mensen de garantie verkeerd begrijpen.
+
+De belofte geldt **gemiddeld over kalibratiesets**, niet voor elke losse set. Had je toevallig
+4000 andere cijfers gekalibreerd, dan was de grens iets anders uitgevallen en de dekking ook.
+Soms zit je er een half procent boven, soms eronder.
+
+Laten we dat niet aannemen maar meten: hetzelfde model, veertig verschillende kalibratiesets.
+""")
+
+code(r"""
+# Het model blijft hetzelfde; alleen de SPLIT tussen kalibratie en test varieert.
+kansen_rest = model.predict_proba(X_rest)
+
+dekkingen = []
+for seed in range(40):
+    k_idx, t_idx = train_test_split(
+        np.arange(len(y_rest)), train_size=4000, random_state=seed, stratify=y_rest)
+    g = bepaal_grens(1 - kansen_rest[k_idx, y_rest[k_idx]], ALPHA)
+    v = (1 - kansen_rest[t_idx]) <= g
+    dekkingen.append(v[np.arange(len(t_idx)), y_rest[t_idx]].mean())
+
+dekkingen = np.array(dekkingen)
+
+print(f"doel                : {1 - ALPHA:.1%}")
+print(f"gemiddelde dekking  : {dekkingen.mean():.2%}   <- dit is wat de garantie belooft")
+print(f"laagste tot hoogste : {dekkingen.min():.2%} tot {dekkingen.max():.2%}")
+print(f"onder het doel      : {(dekkingen < 1 - ALPHA).sum()} van de 40 keer")
+
+fig, ax = plt.subplots(figsize=(7.5, 3.4))
+ax.hist(dekkingen, bins=14, color="#4C72B0")
+ax.axvline(1 - ALPHA, color="#C44E52", lw=2, label=f"doel ({1 - ALPHA:.0%})")
+ax.axvline(dekkingen.mean(), color="#2E8B57", lw=2, ls="--",
+           label=f"gemiddelde ({dekkingen.mean():.2%})")
+ax.set_xlabel("gemeten dekking"); ax.set_ylabel("aantal kalibratiesets")
+ax.set_title("De dekking schommelt rond het doel - dat hoort zo", fontsize=11)
+ax.legend(fontsize=8)
+plt.tight_layout(); plt.show()
+""")
+
+md(r"""
+Het gemiddelde landt op de belofte, en ongeveer de helft van de runs zit eronder. Dat is geen
+gebrek maar de definitie: **marginale dekking.**
+
+Wil je minder schommeling, dan is er één knop: een **grotere kalibratieset**. Wil je een
+garantie die voor élke losse set geldt, dan heb je een ander soort conformal prediction nodig
+(*training-conditional*), en die is conservatiever — je betaalt hem in grotere verzamelingen.
+
+---
+""")
+
+md(r"""
 ## 5. En nu het praktische deel: een werkstroom
 
 Tot hier is het een statistische truc. Nu maken we er iets van waar een organisatie wat aan
