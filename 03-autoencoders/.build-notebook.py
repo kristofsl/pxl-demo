@@ -6,7 +6,7 @@ def code(s): cells.append(nbf.v4.new_code_cell(s.strip("\n")))
 md(r"""
 # Anomaliedetectie: fraude opsporen met een autoencoder
 
-**Topic 2 — PXL · autoencoders op tabulaire data**
+**Topic 3 — PXL · autoencoders op tabulaire data**
 
 ---
 
@@ -557,7 +557,7 @@ De reconstructiefout is een gemiddelde over 29 features. Maar niets belet ons om
 **welke** features niet klopten. Dat maakt van een kaal alarm een bruikbare melding voor de
 analist die hem moet beoordelen.
 
-*(Wie topic 1 gevolgd heeft, herkent dit: we vragen opnieuw waaróm het model iets vindt.)*
+*(Wie topic 2 gevolgd heeft, herkent dit: we vragen opnieuw waaróm het model iets vindt.)*
 """)
 
 code(r"""

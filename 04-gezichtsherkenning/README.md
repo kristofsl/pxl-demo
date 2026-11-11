@@ -1,4 +1,4 @@
-# Topic 3 — Gezichtsherkenning
+# Topic 4 — Gezichtsherkenning
 
 Een werkend gezichtsherkenningssysteem bouwen zonder zelf een gezichtsmodel te trainen —
 en onderweg **transfer learning** en **contrastive learning** leren.

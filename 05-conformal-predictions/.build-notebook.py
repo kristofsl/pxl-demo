@@ -6,7 +6,7 @@ def code(s): cells.append(nbf.v4.new_code_cell(s.strip("\n")))
 md(r"""
 # Conformal prediction: onzekerheid met een garantie
 
-**Topic 4 — PXL · wanneer mag je model zelf beslissen?**
+**Topic 5 — PXL · wanneer mag je model zelf beslissen?**
 
 ---
 

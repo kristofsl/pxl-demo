@@ -8,15 +8,16 @@ ander breken, en kan een student één map downloaden en meteen aan de slag.
 
 | # | Map | Onderwerp | Kernbibliotheken |
 |---|---|---|---|
-| 1 | [`01-explainable-ai/`](01-explainable-ai/) | Een predictie verklaren met **SHAP** en **LIME** op tabulaire data | shap · lime · scikit-learn |
-| 2 | [`02-autoencoders/`](02-autoencoders/) | **Anomaliedetectie**: fraude opsporen met een autoencoder, zonder ooit een fraudelabel te leren | torch · scikit-learn |
-| 3 | [`03-gezichtsherkenning/`](03-gezichtsherkenning/) | **Transfer learning** en **contrastive learning**: gezichtsherkenning op FaceNet-embeddings, met eigen Keras-modellen | keras · tensorflow · mtcnn |
-| 4 | [`04-conformal-predictions/`](04-conformal-predictions/) | **Conformal prediction**: voorspellingen met een garantie die je kunt natellen, en een werkstroom mens-versus-machine | scikit-learn |
+| 1 | [`01-eerste-model/`](01-eerste-model/) | **Van data naar model**: verkennen, categorische kolommen omzetten, splitsen, een beslisboom en een random forest — en in deel 2 een neuraal netwerk op dezelfde data | scikit-learn · keras |
+| 2 | [`02-explainable-ai/`](02-explainable-ai/) | Een predictie verklaren met **SHAP** en **LIME** op tabulaire data | shap · lime · scikit-learn |
+| 3 | [`03-autoencoders/`](03-autoencoders/) | **Anomaliedetectie**: fraude opsporen met een autoencoder, zonder ooit een fraudelabel te leren | torch · scikit-learn |
+| 4 | [`04-gezichtsherkenning/`](04-gezichtsherkenning/) | **Transfer learning** en **contrastive learning**: gezichtsherkenning op FaceNet-embeddings, met eigen Keras-modellen | keras · tensorflow · mtcnn |
+| 5 | [`05-conformal-predictions/`](05-conformal-predictions/) | **Conformal prediction**: voorspellingen met een garantie die je kunt natellen, en een werkstroom mens-versus-machine | scikit-learn |
 
 ## Snel starten
 
 ```bash
-cd 01-explainable-ai
+cd 01-eerste-model
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/jupyter lab
 ```

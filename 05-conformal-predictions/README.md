@@ -1,4 +1,4 @@
-# Topic 4 — Conformal prediction
+# Topic 5 — Conformal prediction
 
 Een model geeft één antwoord. Conformal prediction geeft er een **verzameling** bij, met een
 garantie die je kunt natellen — en daarmee een werkstroom: wat gaat automatisch, en wat gaat

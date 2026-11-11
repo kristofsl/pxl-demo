@@ -9,7 +9,7 @@ def code(s): cells.append(nbf.v4.new_code_cell(s.strip("\n")))
 md(r"""
 # Explainable AI: één predictie, twee verklaringen
 
-**Topic 1 — PXL · SHAP en LIME op tabulaire data**
+**Topic 2 — PXL · SHAP en LIME op tabulaire data**
 
 ---
 

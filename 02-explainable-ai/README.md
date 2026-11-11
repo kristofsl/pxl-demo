@@ -1,4 +1,4 @@
-# Topic 1 — Explainable AI
+# Topic 2 — Explainable AI
 
 Eén tabulaire dataset, één model, één predictie, en **twee manieren om die te verklaren**:
 **SHAP** en **LIME**.

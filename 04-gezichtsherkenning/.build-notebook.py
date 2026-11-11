@@ -6,7 +6,7 @@ def code(s): cells.append(nbf.v4.new_code_cell(s.strip("\n")))
 md(r"""
 # Gezichtsherkenning: transfer learning en contrastive learning
 
-**Topic 3 — PXL · van foto naar "wie is dit?"**
+**Topic 4 — PXL · van foto naar "wie is dit?"**
 
 ---
 

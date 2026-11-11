@@ -1,0 +1,17 @@
+# Topic 1 — Van data naar model
+# Installeren:  python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+
+# --- deel 1: klassieke modellen ---
+numpy>=1.26
+pandas>=2.1
+pyarrow>=15            # om de gecachte dataset te lezen
+scikit-learn>=1.4
+matplotlib>=3.8
+
+# --- deel 2: het neurale netwerk ---
+tensorflow>=2.20       # backend voor Keras 3
+keras>=3.5
+
+# --- notebook-omgeving ---
+jupyterlab>=4.1
+ipywidgets>=8.1

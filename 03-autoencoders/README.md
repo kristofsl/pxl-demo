@@ -1,4 +1,4 @@
-# Topic 2 — Autoencoders: fraude opsporen als anomalie
+# Topic 3 — Autoencoders: fraude opsporen als anomalie
 
 Een autoencoder leert hoe **normale** creditcardtransacties eruitzien. Wat hij daarna niet kan
 namaken, is verdacht.
@@ -91,7 +91,7 @@ fraudepatronen oppikken die nog nooit eerder gezien zijn.
 - **§7** — hier verliest de autoencoder van PCA op ROC-AUC en wint hij op PR-AUC. Uitstekend
   moment om te bespreken waarom je je maat vooraf kiest, en waarom je altijd met een simpele
   baseline begint.
-- **§8** — de brug naar topic 1: van een score naar een uitleg.
+- **§8** — de brug naar topic 2: van een score naar een uitleg.
 
 ### Knoppen om live mee te spelen
 
