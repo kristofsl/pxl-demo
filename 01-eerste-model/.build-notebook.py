@@ -6,76 +6,26 @@ def code(s): cells.append(nbf.v4.new_code_cell(s.strip("\n")))
 md(r"""
 # Van data naar model
 
-**Topic 1 — PXL · een compleet machine learning-project, van begin tot eind**
+**Topic 1 — PXL · machine learning van begin tot eind**
 
 ---
 
-## Waar gaat dit over?
-
-Machine learning klinkt groot, maar het idee erachter is klein:
-
-> **Je geeft de computer een hoop voorbeelden waarvan je het antwoord kent, en hij zoekt zelf
-> het patroon dat die antwoorden verklaart. Daarna pas je dat patroon toe op nieuwe gevallen
-> waarvan je het antwoord nog niet weet.**
-
-Meer is het niet. Geen magie, geen bewustzijn - patroonherkenning op een berg voorbeelden.
-
-In deze notebook doorlopen we dat van begin tot eind, met echte data. Je gaat merken dat het
-grootste deel van het werk **niet** het model is. Het model is vijf regels code. De rest is
-kijken naar je data, begrijpen wat erin zit, en hem in een vorm gieten waar een model mee
-overweg kan.
-
-Dat is geen bijzaak. Dat is het vak.
-
-## De notebook heeft twee delen
-
-**Deel 1** bouwt klassieke modellen: een beslisboom die je letterlijk kunt uittekenen, een
-logistische regressie, en een random forest.
-
-**Deel 2** neemt exact dezelfde data en bouwt er een neuraal netwerk op in Keras. Niet omdat
-dat beter is - dat gaan we juist uitzoeken.
-
-En daar zit het verhaal van deze notebook. Aan het eind leg je alles naast elkaar en zie je
-iets wat veel mensen verrast. Maar vooruitlopen heeft geen zin; eerst bouwen.
-
-## De vraag die we gaan beantwoorden
-
 We gebruiken een volkstelling uit de Verenigde Staten. Van bijna 50.000 mensen weten we
-leeftijd, opleiding, beroep, burgerlijke staat, hoeveel uur ze werken, en nog wat meer.
-En we weten of ze meer of minder dan 50.000 dollar per jaar verdienden.
+leeftijd, opleiding, beroep, burgerlijke staat en hoeveel uur ze werken. En we weten of ze
+meer of minder dan 50.000 dollar per jaar verdienden.
 
 > **Kunnen we uit de rest van de gegevens voorspellen of iemand boven de 50.000 zit?**
 
-Een eerlijke waarschuwing vooraf: in deze data zitten kolommen als geslacht en etniciteit. Een
-model dat daarop voorspelt, legt verschillen bloot die in de samenleving bestaan - en kan ze
-versterken als je er klakkeloos beslissingen op baseert. We gebruiken deze data omdat ze
-realistisch en leerzaam is, maar houd die vraag in je achterhoofd. We komen er aan het eind
-op terug.
+In **deel 1** bouwen we daar klassieke modellen voor. In **deel 2** een neuraal netwerk, op
+exact dezelfde data.
 
-## De route
-
-**Deel 1 - klassieke modellen**
-
-1. Kijken naar de data voordat je iets anders doet
-2. Opruimen: ontbrekende waarden, en kolommen die geen voorspeller zijn
-3. Omzetten: tekst naar getallen, want een model rekent
-4. Splitsen: leren, afstellen en beoordelen op gescheiden stapels
-5. Een beslisboom trainen die je kunt uittekenen
-6. Een tweede model ernaast: logistische regressie
-7. En wat je in de praktijk gebruikt: een random forest
-8. Beoordelen: is dit eigenlijk goed?
-
-**Deel 2 - een neuraal netwerk**
-
-9. Wat een neuraal netwerk eigenlijk is
-10. Er een bouwen in Keras, laag voor laag
-11. Trainen, en de evolutie per ronde grafisch volgen
-12. Overfitting live zien gebeuren, en er iets aan doen
-13. De eerlijke eindvergelijking
+> In deze data zitten kolommen als geslacht en etniciteit. Een model dat daarop voorspelt,
+> legt verschillen bloot die in de samenleving bestaan, en kan ze versterken als je er
+> beslissingen op baseert. We komen daar aan het eind op terug.
 
 ---
 
-# Deel 1 - Klassieke modellen
+# Deel 1 — Klassieke modellen
 """)
 
 md(r"""
@@ -196,11 +146,8 @@ md(r"""
 
 ## 2. Eerst kijken, dan modelleren
 
-De verleiding is groot om meteen een model te trainen. Doe dat niet. Je hebt een halfuur nodig
-om je data te leren kennen, en dat halfuur verdien je tien keer terug — want bijna alle
-problemen die later opduiken, zitten hier al in.
-
-We lopen vier dingen na.
+De verleiding is groot om meteen een model te trainen. Doe dat niet. Bijna alle problemen die
+later opduiken, zitten hier al in je data.
 
 ### 2.1 Wat voorspellen we eigenlijk, en hoe vaak komt het voor?
 
@@ -326,8 +273,8 @@ print(list(data.columns))
 md(r"""
 ### 2.4 Een paar grafieken
 
-Nu pas gaan we kijken of er überhaupt iets te voorspellen valt. Als geen enkele kolom
-samenhangt met het inkomen, kan het beste model ter wereld er niets van maken.
+Valt er überhaupt iets te voorspellen? Als geen enkele kolom samenhangt met het inkomen, kan
+het beste model ter wereld er niets van maken.
 """)
 
 code(r"""
@@ -1038,38 +985,12 @@ print("vraag maar een vraag over de toepassing.")
 md(r"""
 ---
 
-## Deel 1 afgerond
+# Deel 2 — Een neuraal netwerk
 
-Je hebt een compleet project doorlopen:
+Je random forest haalt ruim 86%. **Dat is de meetlat.**
 
-| stap | wat je deed | waarom het ertoe doet |
-|---|---|---|
-| **kijken** | verdeling van de uitkomst, ontbrekende waarden, grafieken | zonder basislijn weet je niet of je iets presteert |
-| **opruimen** | gaten vullen, `fnlwgt` eruit, dubbele kolom eruit | niet alles in je tabel is een voorspeller |
-| **omzetten** | one-hot voor categorieen zonder volgorde | volgnummers verzinnen een rangorde die er niet is |
-| **splitsen** | train / validatie / test | op je testset afstellen is studeren met de examenvragen |
-| **trainen** | boom, regressie, bos - allemaal afgesteld op validatie | de diepste boom is niet de beste boom |
-| **beoordelen** | basislijn, confusion matrix, precisie en recall | "86% goed" zegt op zichzelf bijna niets |
-
-En de twee dingen die je het vaakst terug gaat zien:
-
-**Overfitting.** Een model dat zijn trainingsdata uit het hoofd leert, presteert slecht op
-nieuwe gevallen. Je zag het twee keer: bij een te diepe boom, en bij te weinig data.
-
-**Je voorbewerking hangt af van je model.** Dezelfde fout in de encodering kostte de
-logistische regressie drie keer zoveel als de beslisboom.
-
----
-
-# Deel 2 - Een neuraal netwerk
-
-Je hebt nu een random forest dat ruim 86% haalt. **Dat is je meetlat.**
-
-De vraag van dit tweede deel: levert een neuraal netwerk je hier meer op? Het is immers het
-model waar iedereen het over heeft, en het heeft veel meer vrijheid dan een boom.
-
-We gebruiken exact dezelfde data, dezelfde splitsing en dezelfde kolommen. Alles wat verandert
-is het model. Zo weet je aan het eind zeker dat een verschil in uitkomst door het model komt
+Levert een neuraal netwerk hier meer op? Zelfde data, zelfde splitsing, zelfde kolommen —
+alleen het model verandert. Zo weet je aan het eind zeker dat een verschil door het model komt
 en niet door iets anders.
 
 ## 9. Wat is een neuraal netwerk eigenlijk?
@@ -1115,7 +1036,7 @@ code(r"""
 #
 # LET OP: .fit() alleen op de trainset. Zou je hem op alles fitten, dan
 # lekt informatie uit validatie en test je voorbewerking in. Dezelfde
-# regel als in topic 1, en hier net zo belangrijk.
+# regel als in deel 1, en hier net zo belangrijk.
 # De schaler uit paragraaf 6 is al gefit op X_train; we hergebruiken hem.
 # Keras rekent met float32, dus we zetten alles meteen om.
 X_train_s = schaler.transform(X_train).astype("float32")
@@ -1191,7 +1112,7 @@ Eén neuron doet iets heel simpels, in drie stappen:
 
 Die derde stap lijkt onbenullig maar is cruciaal. Zonder dat knikje zouden alle lagen samen
 niets meer kunnen dan één grote optelsom — dan had je net zo goed de logistische regressie uit
-topic 1 kunnen nemen. **Het is dat knikje dat een netwerk in staat stelt kromme verbanden te
+deel 1 kunnen nemen. **Het is dat knikje dat een netwerk in staat stelt kromme verbanden te
 leren.**
 
 En de **gewichten** zijn wat er geleerd wordt. Die beginnen willekeurig en worden tijdens het
@@ -1283,8 +1204,7 @@ sneller en de bijstelling wordt rustiger, omdat één rare rij het gemiddelde va
 meesleept.
 
 Het belangrijkste staat in de regel `validation_data`. Daarmee meet Keras na **elke** epoch
-hoe het netwerk het doet op data die het niet traint. Dat levert de evolutie op die we zo gaan
-tekenen — en dat is het hele punt van deze paragraaf.
+hoe het netwerk het doet op data die het niet traint.
 """)
 
 code(r"""
@@ -1447,11 +1367,7 @@ md(r"""
 
 ## 13. En nu de eerlijke vergelijking
 
-Alles ligt vast. Tijd voor de testset — die we, net als in topic 1, tot nu toe niet hebben
-aangeraakt.
-
-We leggen alles naast elkaar: de basislijn, de twee modellen uit topic 1 (opnieuw getraind op
-dezelfde splitsing, zodat de vergelijking eerlijk is), en onze twee netwerken.
+Alles ligt vast. Tijd voor de testset, die we tot nu toe niet hebben aangeraakt.
 """)
 
 code(r"""
@@ -1527,34 +1443,19 @@ print(classification_report(y_test, voorspeld, target_names=["<=50K", ">50K"], d
 md(r"""
 ---
 
-## Wat je nu kunt
-
-| begrip | wat het is |
-|---|---|
-| **laag / neuron** | elk neuron weegt alles van de laag ervoor en geeft één getal door |
-| **ReLU** | het knikje dat een netwerk kromme verbanden laat leren |
-| **epoch** | één keer de hele trainingsdata doorlopen |
-| **batch size** | na hoeveel rijen het netwerk zijn knopjes bijstelt |
-| **verliesfunctie** | hoe je meet dat een voorspelling fout is |
-| **optimizer** | hoe je de knopjes bijstelt na die fout |
-| **early stopping** | stoppen zodra het op nieuwe data slechter wordt |
-
-En de drie dingen die blijven hangen:
-
 **Schalen is voor een netwerk verplicht.** Een boom kijkt naar "groter of kleiner dan"; een
 netwerk vermenigvuldigt en telt op, en dan verpletteren grote getallen de kleine.
 
 **Overfitting zie je in de grafiek gebeuren.** De trainlijn die blijft dalen terwijl de
-validatielijn omhoog kruipt — dat beeld moet je herkennen. Daarna is doortrainen schadelijk.
+validatielijn omhoog kruipt — dat beeld moet je herkennen.
 
 **Ingewikkelder is niet beter.** Op deze data verslaan zowel de beslisboom als het random
 forest het neurale netwerk. Dat weet je alleen omdat je de eenvoudige modellen eerst gebouwd
 hebt.
 
-> In **topic 2** gaan we aan allebei deze modellen vragen *waarom* ze iets voorspellen. Want
-> een model dat 86% haalt is leuk, maar zodra iemand vraagt "waarom kreeg déze persoon dit
-> antwoord?" sta je met lege handen.
+> In **topic 2** vragen we aan deze modellen *waarom* ze iets voorspellen.
 """)
+
 nb["cells"]=cells
 nb["metadata"]={"kernelspec":{"display_name":"Python 3","language":"python","name":"python3"},
                 "language_info":{"name":"python","pygments_lexer":"ipython3"}}

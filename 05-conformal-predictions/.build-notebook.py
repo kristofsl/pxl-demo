@@ -40,14 +40,6 @@ De prijs staat in dat woord *verzameling*. Soms krijg je één antwoord terug, s
 juist dát blijkt het nuttigste signaal van allemaal: het model geeft eindelijk toe wanneer het
 twijfelt.
 
-## Wat we gaan doen
-
-1. Een model trainen dat bewust niet perfect is
-2. Zien waarom "97% zeker" geen garantie is
-3. Conformal prediction toepassen — in vier stappen
-4. De garantie natellen
-5. Er een werkstroom van maken: wat automatiseren we, en wat gaat naar een mens?
-6. Kijken naar de gevallen waar het model twijfelt
 """)
 
 md(r"""

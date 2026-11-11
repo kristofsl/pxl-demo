@@ -33,15 +33,6 @@ heel precies hoe **normaal** eruitziet. Alles wat daar niet in past, is verdacht
 Het gereedschap daarvoor is de **autoencoder**: een neuraal netwerk dat je traint om zijn eigen
 invoer weer uit te spugen. Klinkt nutteloos — tot je het een flessenhals geeft.
 
-## Wat gaan we doen?
-
-1. De fraudedataset bekijken en zien hoe scheef hij is.
-2. Begrijpen wat een autoencoder is en waarom dat werkt voor anomalieën.
-3. Er één bouwen en trainen — **alleen op normale transacties**.
-4. De reconstructiefout gebruiken als anomaliescore.
-5. Een drempel kiezen, en zien wat die keuze kost.
-6. Controleren of dat neurale netwerk wel nodig was.
-7. Uitzoeken *waarom* een transactie gemarkeerd werd.
 """)
 
 md(r"""

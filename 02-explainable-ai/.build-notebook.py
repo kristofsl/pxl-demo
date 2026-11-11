@@ -30,36 +30,6 @@ Dat "waarom" is om drie redenen belangrijk:
 | **Debuggen** | Als het model vooral kijkt naar het patiëntnummer, heb je *data leakage*. |
 | **Wetgeving** | AVG/GDPR art. 22 en de EU AI Act eisen uitleg bij geautomatiseerde beslissingen. |
 
-## Twee assen om uitlegmethodes in te delen
-
-1. **Globaal vs. lokaal**
-   - *Globaal*: hoe gedraagt het model zich in het algemeen? ("Welke features zijn belangrijk?")
-   - *Lokaal*: waarom kreeg **deze ene** rij **deze** predictie?
-2. **Model-specifiek vs. model-agnostisch**
-   - *Model-specifiek*: gebruikt de interne structuur (bv. de boomsplits van een random forest). Snel en exact.
-   - *Model-agnostisch*: behandelt het model als een functie `x -> predictie`. Werkt op álles, maar is een benadering.
-
-De methode die we behandelen, **SHAP**, doet allebei: hij is in de kern lokaal — hij verklaart
-één rij — maar je kunt die lokale verklaringen optellen tot een globaal beeld. Dat maakt hem
-veruit de meest gebruikte.
-
-## De opzet van deze notebook
-
-We nemen **één dataset**, **één model** en **één patiënt**, en verklaren die ene predictie tot
-op de komma.
-
-> **1. Het idee** → **2. De explainer opzetten** → **3. Globale uitleg** →
-> **4. Lokale uitleg van onze patiënt**
-
-Maar we beginnen niet bij SHAP. Eerst kijken we naar het gereedschap dat scikit-learn gratis
-meelevert — en waarom dat je op het verkeerde been zet.
-
-## Inhoud
-
-0. Setup
-1. De dataset
-2. Het black-box model + waarom de ingebouwde feature importance tekortschiet
-3. **SHAP**: het idee, globale uitleg, en één patiënt volledig ontleed
 """)
 
 # ============================================================ 0 SETUP
@@ -576,19 +546,6 @@ plt.show()
 
 md(r"""
 ---
-
-## Wat je nu kunt
-
-Je hebt een random forest van 300 bomen — een model dat niemand kan overzien — en je kunt er
-nu per patiënt een verklaring uit halen die je aan een arts kunt voorleggen.
-
-| | wat je deed |
-|---|---|
-| **§2.1** | gezien dat `feature_importances_` misleidt: berekend op trainingsdata, zonder richting, en alleen globaal |
-| **§2.2** | permutation importance van nul opgebouwd: maak een kolom kapot en kijk wat je mist |
-| **§3.1** | het idee achter SHAP: verdeel de predictie eerlijk over de features, zoals je een winst over spelers verdeelt |
-| **§3.3** | die lokale waarden opgeteld tot een globaal beeld |
-| **§3.4** | één patiënt volledig ontleed, met de waterfall en de force plot |
 
 ### De drie dingen die blijven hangen
 

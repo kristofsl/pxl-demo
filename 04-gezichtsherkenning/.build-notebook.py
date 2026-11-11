@@ -24,27 +24,6 @@ overal in de moderne AI tegenkomt:
 | **Transfer learning** | Neem een netwerk dat al iets geleerd heeft, en gebruik die kennis voor jouw probleem | §3: FaceNet zet elk gezicht om in 512 getallen |
 | **Contrastive learning** | Leer niet "wat is dit?" maar "welke twee horen bij elkaar?" | §6 en §7: twee eigen modellen die met paren werken |
 
-## De opzet
-
-```
-   foto  ──►  [1] gezicht vinden  ──►  [2] embedding maken  ──►  [3] ons eigen model  ──►  naam
-              MTCNN                    FaceNet                    Keras
-              (bounding box)           (512 getallen)             (dat trainen we zelf)
-```
-
-Stap 1 en 2 zijn kant-en-klare modellen — dat is de transfer learning. **Stap 3 schrijven we
-helemaal zelf in Keras**, en dat is precies het stuk dat het voor jouw gezichten laat werken.
-
-## Inhoud
-
-1. De foto's
-2. Gezichten vinden met MTCNN
-3. Van gezicht naar embedding
-4. De embeddingruimte verkennen
-5. Ons eigen model: wie is dit?
-6. Contrastive learning: de ruimte verbouwen (triplet loss)
-7. Of: de vergelijking zelf leren (pairwise model)
-8. Je eigen foto
 """)
 
 md(r"""
