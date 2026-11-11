@@ -16,17 +16,30 @@ ander breken, en kan een student één map downloaden en meteen aan de slag.
 
 ## Snel starten
 
+Elk topic heeft een `start.sh` die alles doet: virtual environment aanmaken, pakketten
+installeren, data ophalen en JupyterLab openen.
+
 ```bash
-cd 01-eerste-model
-python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-.venv/bin/jupyter lab
+cd 01-eerste-model && ./start.sh
 ```
 
-Elke topicmap heeft een eigen `README.md` met de precieze instructies.
+**Elk topic draait op zijn eigen poort**, dus je kunt ze allemaal tegelijk open hebben:
 
-> ⚠️ Start Jupyter **altijd** via `.venv/bin/jupyter` (of met de venv geactiveerd).
-> Typ je gewoon `jupyter lab`, dan gebruik je de systeem-Jupyter en vindt Python de
-> geïnstalleerde pakketten niet.
+| topic | poort | |
+|---|---|---|
+| 1 — Van data naar model | 8881 | http://localhost:8881 |
+| 2 — Explainable AI | 8882 | http://localhost:8882 |
+| 3 — Autoencoders | 8883 | http://localhost:8883 |
+| 4 — Gezichtsherkenning | 8884 | http://localhost:8884 |
+| 5 — Conformal prediction | 8885 | http://localhost:8885 |
+
+Stoppen doe je met Ctrl-C in het venster waar je het script startte. De eerste keer duurt het
+installeren even; daarna staat JupyterLab er binnen enkele seconden.
+
+Liever met de hand? Elke topicmap heeft een eigen `README.md` met de losse stappen.
+
+> ⚠️ Start je Jupyter zelf, doe dat dan **altijd** via `.venv/bin/jupyter`. Typ je gewoon
+> `jupyter lab`, dan gebruik je de systeem-Jupyter en vindt Python de pakketten niet.
 
 ## De conventie per topic
 

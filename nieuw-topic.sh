@@ -52,7 +52,20 @@ Eén zin over wat dit topic behandelt.
 | **Duur** | … |
 | **Voorkennis** | … |
 
-## 1. Eenmalige installatie
+## Snel starten
+
+\`\`\`bash
+./start.sh
+\`\`\`
+
+Opent JupyterLab op **http://localhost:88${NUMMER#0}**. Elk topic heeft zijn eigen poort,
+dus je kunt ze allemaal tegelijk open hebben.
+
+---
+
+## Met de hand
+
+### 1. Eenmalige installatie
 
 Vanuit deze map:
 
@@ -94,6 +107,65 @@ python3 -m venv "$DOEL/.venv"
 "$DOEL/.venv/bin/pip" install --upgrade pip --quiet
 "$DOEL/.venv/bin/pip" install -r "$DOEL/requirements.txt" --quiet
 
+echo "==> start.sh aanmaken (poort 88${NUMMER#0})"
+cat > "$DOEL/start.sh" <<START
+#!/usr/bin/env bash
+#
+# Start dit topic. Doet alles wat nodig is en opent JupyterLab op een eigen poort,
+# zodat je alle topics tegelijk kunt laten draaien.
+#
+#   ./start.sh
+#
+set -euo pipefail
+
+HIER="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)"
+cd "\$HIER"
+
+POORT=88${NUMMER#0}
+NOTEBOOK="${NAAM}.ipynb"
+TOPIC="Topic ${NUMMER} — ${NAAM}"
+
+echo "=============================================================="
+echo " \$TOPIC"
+echo "=============================================================="
+
+if ! command -v python3 >/dev/null 2>&1; then
+    echo "FOUT: python3 niet gevonden." >&2
+    exit 1
+fi
+
+# Een venv bevat absolute paden: na hernoemen of verplaatsen opnieuw aanmaken.
+if [ -d .venv ] && ! .venv/bin/jupyter --version >/dev/null 2>&1; then
+    echo "--> de virtual environment werkt niet meer (map verplaatst?), opnieuw aanmaken"
+    rm -rf .venv
+fi
+
+if [ ! -d .venv ]; then
+    echo "--> virtual environment aanmaken (eenmalig)"
+    python3 -m venv .venv
+    .venv/bin/pip install --quiet --disable-pip-version-check --upgrade pip
+fi
+
+STEMPEL=".venv/.requirements-vingerafdruk"
+HUIDIG="\$(shasum requirements.txt | cut -d' ' -f1)"
+if [ ! -f "\$STEMPEL" ] || [ "\$(cat "\$STEMPEL")" != "\$HUIDIG" ]; then
+    echo "--> pakketten installeren (de eerste keer duurt dit even)"
+    .venv/bin/pip install --quiet --disable-pip-version-check -r requirements.txt
+    echo "\$HUIDIG" > "\$STEMPEL"
+fi
+
+if [ -f haal_data.py ]; then
+    .venv/bin/python haal_data.py
+fi
+
+echo
+echo "--> JupyterLab opent op http://localhost:\$POORT"
+echo "    Stoppen doe je met Ctrl-C in dit venster."
+echo
+exec .venv/bin/jupyter lab --port="\$POORT" --port-retries=0 "\$NOTEBOOK"
+START
+chmod +x "$DOEL/start.sh"
+
 echo "==> Lege notebook aanmaken"
 "$DOEL/.venv/bin/python" - "$DOEL/${NAAM}.ipynb" "$NUMMER" "$NAAM" <<'PYEOF'
 import sys, nbformat as nbf
@@ -132,6 +204,6 @@ PYEOF
 echo
 echo "✅ Klaar. Volgende stappen:"
 echo "   cd ${MAP}"
-echo "   .venv/bin/jupyter lab ${NAAM}.ipynb"
+echo "   ./start.sh          # doet alles en opent JupyterLab op poort 88${NUMMER#0}"
 echo
 echo "   Vergeet ${MAP} niet toe te voegen aan de topictabel in ../README.md"

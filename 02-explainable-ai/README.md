@@ -13,7 +13,26 @@ niemand kan overzien. Deze notebook haalt er per patiënt een verklaring uit met
 
 ---
 
-## 1. Eenmalige installatie
+## Snel starten
+
+```bash
+./start.sh
+```
+
+Dat is alles. Het script maakt de virtual environment aan als die er nog niet is, installeert
+wat nodig is, haalt de data op, en opent JupyterLab op **http://localhost:8882**.
+
+Elk topic heeft zijn eigen poort, dus je kunt ze allemaal tegelijk open hebben.
+Stoppen doe je met Ctrl-C in het venster waar je het script startte.
+
+> Draai je het een tweede keer, dan slaat hij de installatie over en staat JupyterLab er
+> binnen enkele seconden.
+
+---
+
+## Met de hand, als je liever ziet wat er gebeurt
+
+### 1. Eenmalige installatie
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install --upgrade pip && .venv/bin/pip install -r requirements.txt
@@ -21,7 +40,7 @@ python3 -m venv .venv && .venv/bin/pip install --upgrade pip && .venv/bin/pip in
 
 De dataset zit in scikit-learn ingebakken, dus er is geen downloadstap.
 
-## 2. De notebook starten
+### 2. De notebook starten
 
 ```bash
 .venv/bin/jupyter lab explainable-ai-shap.ipynb
@@ -31,7 +50,7 @@ De dataset zit in scikit-learn ingebakken, dus er is geen downloadstap.
 
 > ⚠️ Houd de notebook **gesloten in JupyterLab** terwijl je hem ergens anders bewerkt.
 
-## 3. Controleren of alles werkt
+### 3. Controleren of alles werkt
 
 ```bash
 .venv/bin/jupyter nbconvert --to notebook --execute --inplace explainable-ai-shap.ipynb

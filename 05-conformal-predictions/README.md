@@ -14,7 +14,26 @@ naar een mens?
 
 ---
 
-## 1. Eenmalige installatie
+## Snel starten
+
+```bash
+./start.sh
+```
+
+Dat is alles. Het script maakt de virtual environment aan als die er nog niet is, installeert
+wat nodig is, haalt de data op, en opent JupyterLab op **http://localhost:8885**.
+
+Elk topic heeft zijn eigen poort, dus je kunt ze allemaal tegelijk open hebben.
+Stoppen doe je met Ctrl-C in het venster waar je het script startte.
+
+> Draai je het een tweede keer, dan slaat hij de installatie over en staat JupyterLab er
+> binnen enkele seconden.
+
+---
+
+## Met de hand, als je liever ziet wat er gebeurt
+
+### 1. Eenmalige installatie
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install --upgrade pip && .venv/bin/pip install -r requirements.txt
@@ -26,7 +45,7 @@ python3 -m venv .venv && .venv/bin/pip install --upgrade pip && .venv/bin/pip in
 
 Daarna heeft de notebook geen internet meer nodig.
 
-## 2. De notebook starten
+### 2. De notebook starten
 
 ```bash
 .venv/bin/jupyter lab conformal-prediction.ipynb

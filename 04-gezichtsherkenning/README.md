@@ -14,7 +14,26 @@ en onderweg **transfer learning** en **contrastive learning** leren.
 
 ---
 
-## 1. Eenmalige installatie
+## Snel starten
+
+```bash
+./start.sh
+```
+
+Dat is alles. Het script maakt de virtual environment aan als die er nog niet is, installeert
+wat nodig is, haalt de data op, en opent JupyterLab op **http://localhost:8884**.
+
+Elk topic heeft zijn eigen poort, dus je kunt ze allemaal tegelijk open hebben.
+Stoppen doe je met Ctrl-C in het venster waar je het script startte.
+
+> Draai je het een tweede keer, dan slaat hij de installatie over en staat JupyterLab er
+> binnen enkele seconden.
+
+---
+
+## Met de hand, als je liever ziet wat er gebeurt
+
+### 1. Eenmalige installatie
 
 Vanuit deze map, twee stappen:
 
@@ -32,7 +51,7 @@ De tweede stap haalt LFW op, knipt er 16 personen uit en zet die als JPEG's in
 > De modelgewichten van MTCNN en FaceNet worden bij de eerste `import` gedownload (~90 MB) en
 > daarna gecacht. Draai de notebook dus één keer vóór de les.
 
-## 2. De notebook starten
+### 2. De notebook starten
 
 ```bash
 .venv/bin/jupyter lab gezichtsherkenning.ipynb
@@ -42,7 +61,7 @@ De tweede stap haalt LFW op, knipt er 16 personen uit en zet die als JPEG's in
 
 > ⚠️ Houd de notebook **gesloten in JupyterLab** terwijl je hem ergens anders bewerkt.
 
-## 3. Je eigen foto toevoegen
+### 3. Je eigen foto toevoegen
 
 Dat is het leukste deel van de les, en het kost niets:
 

@@ -13,7 +13,26 @@ namaken, is verdacht.
 
 ---
 
-## 1. Eenmalige installatie
+## Snel starten
+
+```bash
+./start.sh
+```
+
+Dat is alles. Het script maakt de virtual environment aan als die er nog niet is, installeert
+wat nodig is, haalt de data op, en opent JupyterLab op **http://localhost:8883**.
+
+Elk topic heeft zijn eigen poort, dus je kunt ze allemaal tegelijk open hebben.
+Stoppen doe je met Ctrl-C in het venster waar je het script startte.
+
+> Draai je het een tweede keer, dan slaat hij de installatie over en staat JupyterLab er
+> binnen enkele seconden.
+
+---
+
+## Met de hand, als je liever ziet wat er gebeurt
+
+### 1. Eenmalige installatie
 
 Vanuit deze map, twee stappen:
 
@@ -29,7 +48,7 @@ De tweede stap haalt de dataset één keer op bij OpenML en bewaart een compacte
 `data/` (17 MB). **Daarna heeft de notebook geen internet meer nodig** — handig, want wifi in
 een leslokaal is geen afhankelijkheid die je wil hebben.
 
-## 2. De notebook starten
+### 2. De notebook starten
 
 ```bash
 .venv/bin/jupyter lab autoencoder-fraudedetectie.ipynb
@@ -41,7 +60,7 @@ een leslokaal is geen afhankelijkheid die je wil hebben.
 > ⚠️ Houd de notebook **gesloten in JupyterLab** terwijl je hem ergens anders bewerkt. Een open
 > tab schrijft bij het opslaan zijn eigen (oude) versie over het bestand heen.
 
-## 3. Controleren of alles werkt
+### 3. Controleren of alles werkt
 
 ```bash
 .venv/bin/jupyter nbconvert --to notebook --execute --inplace autoencoder-fraudedetectie.ipynb
