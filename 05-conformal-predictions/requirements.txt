@@ -1,4 +1,4 @@
-# Topic 4 — Conformal predictions: betrouwbaarheid met garantie
+# Topic 5 — Conformal predictions: betrouwbaarheid met garantie
 # Installeren:  python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 
 numpy>=1.26

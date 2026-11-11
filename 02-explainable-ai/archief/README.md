@@ -4,7 +4,7 @@ Niet voor de les — dit is een eerdere versie die hier bewaard staat.
 
 ## `explainable-ai-shap-lime-ig.ipynb`
 
-De notebook uit deze map, maar met een **derde methode** erbij:
+De notebook uit deze map, maar met **LIME** en een derde methode erbij:
 **Integrated Gradients** (§5), inclusief een uitgetekende uitleg van het saturatieprobleem,
 het pad door de featureruimte, een implementatie van IG in 10 regels `torch.autograd`,
 en de brug naar Expected Gradients (`shap.GradientExplainer`).
@@ -17,7 +17,7 @@ PyTorch-netwerk op dezelfde dataset.
 Er zijn twee extra pakketten nodig die **niet** in `../requirements.txt` staan:
 
 ```bash
-../.venv/bin/pip install torch captum
+../.venv/bin/pip install lime torch captum
 ../.venv/bin/jupyter lab explainable-ai-shap-lime-ig.ipynb
 ```
 

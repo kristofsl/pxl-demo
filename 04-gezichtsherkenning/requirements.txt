@@ -1,4 +1,4 @@
-# Topic 3 — Gezichtsherkenning: transfer learning en contrastive learning
+# Topic 4 — Gezichtsherkenning: transfer learning en contrastive learning
 # Installeren:  python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 
 # --- data ---

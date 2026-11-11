@@ -9,7 +9,7 @@ ander breken, en kan een student één map downloaden en meteen aan de slag.
 | # | Map | Onderwerp | Kernbibliotheken |
 |---|---|---|---|
 | 1 | [`01-eerste-model/`](01-eerste-model/) | **Van data naar model**: verkennen, categorische kolommen omzetten, splitsen, een beslisboom en een random forest — en in deel 2 een neuraal netwerk op dezelfde data | scikit-learn · keras |
-| 2 | [`02-explainable-ai/`](02-explainable-ai/) | Een predictie verklaren met **SHAP** en **LIME** op tabulaire data | shap · lime · scikit-learn |
+| 2 | [`02-explainable-ai/`](02-explainable-ai/) | Een predictie verklaren met **SHAP**: waarom zegt het model dit over déze patiënt? | shap · scikit-learn |
 | 3 | [`03-autoencoders/`](03-autoencoders/) | **Anomaliedetectie**: fraude opsporen met een autoencoder, zonder ooit een fraudelabel te leren | torch · scikit-learn |
 | 4 | [`04-gezichtsherkenning/`](04-gezichtsherkenning/) | **Transfer learning** en **contrastive learning**: gezichtsherkenning op FaceNet-embeddings, met eigen Keras-modellen | keras · tensorflow · mtcnn |
 | 5 | [`05-conformal-predictions/`](05-conformal-predictions/) | **Conformal prediction**: voorspellingen met een garantie die je kunt natellen, en een werkstroom mens-versus-machine | scikit-learn |
