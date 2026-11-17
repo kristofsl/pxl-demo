@@ -680,6 +680,23 @@ eerlijk blijft.
 
 Als maat nemen we de **AUC**: de kans dat een willekeurig gelijk paar een betere score krijgt
 dan een willekeurig ongelijk paar. 1,0 is perfect, 0,5 is muntje opgooien.
+
+**En nee, daar heb je geen kansen voor nodig.** AUC wordt meestal getoond bij een classifier
+die netjes iets tussen 0 en 1 uitspuugt, en daardoor denk je al snel dat dat een eis is. Dat
+is het niet. Wat binair moet zijn is het *juiste antwoord* — zelfde persoon: ja of nee. De
+score mag elk getal zijn, want de ROC-curve schuift gewoon een drempel over alle waarden die
+voorkomen en kijkt alleen naar de **volgorde**.
+
+Daarom kunnen we hier de kale cosinus invoeren, die van -1 tot 1 loopt. Zet er een sigmoid
+overheen en je krijgt exact dezelfde AUC: elke bewerking die de volgorde intact laat,
+verandert niets.
+
+Eén ding moet wel kloppen: **hoger moet "waarschijnlijker dezelfde persoon" betekenen.**
+Daarom voeren we de similariteit in en niet de afstand. Met afstand zou je `-afstand` moeten
+nemen, anders meet je 1 - AUC.
+
+Dat is meteen waarom we in §7 de cosinus (-1 tot 1) en ons eigen netwerk (0 tot 1) in dezelfde
+tabel mogen zetten: AUC kijkt niet naar de schaal, alleen naar de rangschikking.
 """)
 
 code(r"""
