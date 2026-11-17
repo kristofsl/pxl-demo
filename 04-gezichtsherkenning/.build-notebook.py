@@ -250,13 +250,13 @@ embeddings = embedder.embeddings(gezichten)
 print(f"vorm: {embeddings.shape}   ({embeddings.shape[0]} gezichten x {embeddings.shape[1]} getallen)")
 print(f"lengte van elke vector: {np.linalg.norm(embeddings, axis=1)[:5].round(3)}")
 print()
-print("Alle vectoren hebben lengte 1: ze liggen op een bol.")
+print("Alle vectoren hebben lengte 1.")
 print()
-print("Dat is geen toeval maar een ontwerpkeuze van FaceNet, en het heeft")
-print("twee gevolgen. Ten eerste zijn alle afstanden op dezelfde schaal, dus")
-print("vergelijkbaar. Ten tweede kun je 'afstand' en 'hoek' door elkaar")
-print("gebruiken: op een bol liggen twee punten dicht bij elkaar precies")
-print("wanneer de hoek tussen hun vectoren klein is.")
+print("Dat is geen toeval maar een ontwerpkeuze van FaceNet. Doordat de lengte")
+print("van elke vector vastligt, blijft er nog maar één ding over waarin twee")
+print("gezichten van elkaar kunnen verschillen: de RICHTING waarin hun vector")
+print("wijst. Alle afstanden liggen daardoor op dezelfde schaal en zijn dus")
+print("onderling vergelijkbaar.")
 print()
 print("Zo ziet één gezicht eruit als getallen (eerste 8 van de 512):")
 print(embeddings[0][:8].round(4))
@@ -267,66 +267,6 @@ print("512 kwadraten. Lagen ze allemaal even ver van nul, dan was elk getal")
 print(f"1/wortel(512) = {1/np.sqrt(512):.4f}. Even narekenen:")
 print(f"  som van alle kwadraten : {(embeddings[0] ** 2).sum():.4f}")
 print(f"  wortel daarvan         : {np.sqrt((embeddings[0] ** 2).sum()):.4f}")
-""")
-
-md(r"""
-### "Ze liggen op een bol" — hoezo?
-
-Dat klinkt abstract, maar het is letterlijk de definitie van een bol.
-
-Een bol is *de verzameling punten die allemaal even ver van het midden liggen*. Precies dat
-geldt hier: elke vector heeft lengte 1, dus elk gezicht ligt op afstand 1 van de oorsprong.
-
-Begin bij twee dimensies, dan kun je het tekenen.
-""")
-
-code(r"""
-# In twee dimensies kun je het zien. In 512 niet, maar het idee is hetzelfde.
-hoeken = np.linspace(0, 2 * np.pi, 7)[:-1]       # zes richtingen
-rng_bol = np.random.default_rng(RANDOM_STATE)
-
-fig, (links, rechts) = plt.subplots(1, 2, figsize=(10, 4.6))
-
-# --- links: zes vectoren van lengte 1 ---
-cirkel = np.linspace(0, 2 * np.pi, 300)
-links.plot(np.cos(cirkel), np.sin(cirkel), color="0.8", lw=1.5)
-for h in hoeken:
-    links.arrow(0, 0, np.cos(h) * 0.93, np.sin(h) * 0.93, head_width=0.06,
-                color="#4C72B0", length_includes_head=True)
-    links.plot(np.cos(h), np.sin(h), "o", ms=7, color="#C44E52")
-links.text(0, -1.35, "elke pijl is even lang (lengte 1)\nhun punten vormen samen een cirkel",
-           ha="center", fontsize=9)
-links.set_xlim(-1.5, 1.5); links.set_ylim(-1.6, 1.4)
-links.set_aspect("equal"); links.axis("off")
-links.set_title("twee dimensies", fontsize=11)
-
-# --- rechts: vectoren van verschillende lengte, zonder normaliseren ---
-rechts.plot(np.cos(cirkel), np.sin(cirkel), color="0.9", lw=1, ls="--")
-for h in hoeken:
-    lengte = rng_bol.uniform(0.35, 1.4)
-    rechts.arrow(0, 0, np.cos(h) * lengte * 0.93, np.sin(h) * lengte * 0.93,
-                 head_width=0.06, color="0.55", length_includes_head=True)
-    rechts.plot(np.cos(h) * lengte, np.sin(h) * lengte, "o", ms=7, color="0.45")
-rechts.text(0, -1.35, "zonder normaliseren: alle kanten op,\nen ook nog verschillend lang",
-            ha="center", fontsize=9)
-rechts.set_xlim(-1.5, 1.5); rechts.set_ylim(-1.6, 1.4)
-rechts.set_aspect("equal"); rechts.axis("off")
-rechts.set_title("ter vergelijking", fontsize=11)
-
-plt.tight_layout(); plt.show()
-""")
-
-md(r"""
-In twee dimensies heet die verzameling een **cirkel**, in drie dimensies een **bol**. FaceNet
-werkt in 512 dimensies — dat kun je niet tekenen, maar er verandert niets aan het idee. Alle
-gezichten liggen op gelijke afstand van het midden.
-
-**En dat is precies waarom het zo gedaan is.** Doordat de lengte vastligt, blijft er maar één
-ding over waarin twee gezichten van elkaar kunnen verschillen: de **richting** waarin hun pijl
-wijst. Twee foto's van dezelfde persoon wijzen bijna dezelfde kant op; twee verschillende
-mensen wijzen uit elkaar.
-
-Daarom kunnen we straks met hoeken rekenen in plaats van met lengtes.
 """)
 
 md(r"""
@@ -841,7 +781,7 @@ def maak_projectiehoofd(dim_in=512, dim_uit=64):
             keras.Input(shape=(dim_in,), name="facenet_embedding"),
             layers.Dense(256, activation="relu", name="verborgen"),
             layers.Dense(dim_uit, name="projectie"),
-            layers.UnitNormalization(name="op_de_bol"),   # terug naar lengte 1
+            layers.UnitNormalization(name="lengte_1"),     # terug naar lengte 1
         ],
         name="projectiehoofd",
     )
