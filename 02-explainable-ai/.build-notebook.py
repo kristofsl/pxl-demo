@@ -90,10 +90,6 @@ in scikit-learn zit ingebakken — dus geen download nodig.
   zijn telkens drie varianten berekend: `mean` (gemiddelde), `error` (standaardfout)
   en `worst` (gemiddelde van de drie "ergste" kernen).
 - **Target**: `0 = malignant` (kwaadaardig), `1 = benign` (goedaardig).
-
-> ⚠️ **Let op de codering**: in deze dataset is `1` de *goede* uitkomst. Dat is
-> contra-intuïtief en een klassieke bron van fouten bij het interpreteren van uitleg.
-> We houden daarom overal expliciet bij welke klasse we verklaren.
 """)
 
 code(r"""
@@ -192,8 +188,6 @@ y_proba = model.predict_proba(X_test)[:, 1]  # kans op klasse 1 (= benign/goedaa
 
 print(f"Accuracy : {accuracy_score(y_test, y_pred):.3f}")
 print(f"ROC AUC  : {roc_auc_score(y_test, y_proba):.3f}")
-print()
-print(classification_report(y_test, y_pred, target_names=class_names))
 """)
 
 code(r"""
@@ -542,36 +536,6 @@ code(r"""
 shap.plots.force(shap_benign[i], matplotlib=True, show=False, figsize=(20, 3))
 plt.tight_layout()
 plt.show()
-""")
-
-md(r"""
----
-
-### De drie dingen die blijven hangen
-
-**Een SHAP-waarde is geen causaal effect.** Hij zegt wat het *model* deed, niet wat de
-*werkelijkheid* doet. Leert je model dat het aantal brandweerwagens een brand voorspelt, dan
-toont SHAP dat netjes. De uitleg klopt; het model is verkeerd.
-
-**Gecorreleerde features delen hun krediet.** `mean radius`, `mean perimeter` en `mean area`
-meten alledrie hetzelfde. Elk krijgt ongeveer een derde van het belang, waardoor ze
-afzonderlijk onbelangrijk lijken terwijl de groep cruciaal is. Dat zag je in §2.2 al gebeuren
-bij permutation importance, en het geldt hier net zo goed.
-
-**Uitleg van een slecht model is waardeloos.** Controleer eerst of het model überhaupt iets
-presteert. Een perfect uitgelegde muntworp blijft een muntworp.
-
-### Waar je dit voor gebruikt
-
-Niet om een mooi plaatje bij je rapport te plakken, maar om drie concrete vragen te
-beantwoorden:
-
-- **Klopt dit wel?** Staat er een administratief veld bovenaan je importance-lijst — een
-  patiëntnummer, een datum — dan heb je data leakage en geen model.
-- **Waarom deze beslissing?** De AVG en de EU AI Act vragen bij geautomatiseerde beslissingen
-  om uitleg. Een waterfall plot per geval is een antwoord dat standhoudt.
-- **Waar gaat het mis?** Pak een geval waar het model ernaast zat en kijk welke features het de
-  verkeerde kant op duwden. Dat is vaak leerzamer dan honderd correcte voorspellingen.
 """)
 
 nb["cells"] = cells

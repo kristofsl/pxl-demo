@@ -330,14 +330,6 @@ for ax, kolom in zip(assen, ["marital-status", "occupation", "sex"]):
     ax.set_xlabel("aandeel hoog inkomen"); ax.set_ylabel("")
     ax.set_title(kolom, fontsize=11); ax.tick_params(labelsize=7)
 plt.tight_layout(); plt.show()
-
-print("Burgerlijke staat blijkt een van de sterkste signalen in deze data -")
-print("sterker dan je op het eerste gezicht zou verwachten.")
-print()
-print("En kijk naar de rechtergrafiek. Die laat precies zien waarom je bij")
-print("dit soort modellen moet opletten: het verschil tussen mannen en vrouwen")
-print("in deze data uit 1994 is groot. Een model dat hierop traint, leert dat")
-print("verschil en zal het reproduceren.")
 """)
 
 md(r"""
@@ -956,33 +948,6 @@ print(f"  {fn:>5,d}  ten onrechte 'laag' gezegd   <- de grootste foutengroep")
 """)
 
 md(r"""
-### Het getal achter het getal
-
-Kijk naar die laatste regel. Van de mensen die écht boven de 50.000 zaten, mist het model er een
-flink deel. Toch is de totale score 85%.
-
-Dat komt doordat accuracy alle fouten even zwaar telt, terwijl de groepen heel ongelijk zijn.
-Er zijn drie keer zoveel lage als hoge inkomens, dus je kunt een heleboel hoge inkomens missen
-en nog steeds hoog scoren.
-
-`classification_report` splitst dat uit in twee getallen per groep:
-
-- **precisie** — van alle keren dat het model "hoog" zei, hoe vaak klopte dat?
-- **recall** — van alle mensen die écht hoog zaten, hoeveel heeft het model er gevonden?
-""")
-
-code(r"""
-print(classification_report(y_test, voorspeld, target_names=["<=50K", ">50K"], digits=3))
-print("Lees de regel '>50K':")
-print("  precisie = als het model 'hoog' zegt, hoe vaak heeft het gelijk")
-print("  recall   = welk deel van de echte hoge inkomens vindt het")
-print()
-print("Die twee lopen uit elkaar, en welke van de twee je belangrijk vindt,")
-print("hangt af van wat je met het model gaat doen. Dat is geen technische")
-print("vraag maar een vraag over de toepassing.")
-""")
-
-md(r"""
 ---
 
 # Deel 2 — Een neuraal netwerk
@@ -1393,67 +1358,6 @@ uitslag = pd.DataFrame({
 display(uitslag.style.format("{:.2%}"))
 
 print("Gesorteerd van slecht naar goed. Kijk waar het netwerk belandt.")
-""")
-
-md(r"""
-### Dit is de les van deze notebook
-
-Kijk naar die tabel. Het neurale netwerk, met vierduizend parameters, verplichte schaling,
-zestig trainingsrondes en een early-stoppingmechanisme, **verslaat geen van beide modellen uit
-deel 1.** Niet de beslisboom, en al helemaal niet het random forest — dat met één regel code
-gebouwd was, geen schaling nodig had en in anderhalve seconde klaar was.
-
-Dat is geen fout in je code en geen ongeluk. Het is een bekend en goed onderzocht gegeven:
-
-> **Op tabulaire data — rijen en kolommen, gemengd numeriek en categorisch — presteren
-> boomgebaseerde modellen doorgaans even goed of beter dan neurale netwerken.**
-
-Netwerken blinken uit waar de structuur ingewikkeld is en je zelf geen bruikbare kenmerken
-kunt bedenken: beeld, geluid, taal. Bij een tabel met 12 kolommen is die structuur er niet.
-Een boom kan daar direct op splitsen; een netwerk moet hetzelfde uit duizenden gewichten
-afleiden.
-
-Let ook op de derde regel: het netwerk dat we te lang lieten doorploeteren is slechter dan het
-netwerk dat op tijd stopte. Meer trainen is niet meer leren.
-
-**Wat je hiervan meeneemt:** begin altijd met het eenvoudige model. Niet omdat het eenvoudig
-is, maar omdat je zonder dat vergelijkingspunt niet weet of je ingewikkelde model iets waard
-is. Was dit netwerk je enige model geweest, dan had je 85% gezien en tevreden geknikt.
-
-En let op wat je naast nauwkeurigheid nog meer inlevert: het netwerk kostte je schaling, een
-keuze over lagen en neuronen, zestig trainingsrondes en een stopmechanisme. Het random forest
-kostte je één regel. Bij gelijke uitkomst wint het eenvoudigste model altijd, want er is minder
-dat stuk kan gaan.
-""")
-
-code(r"""
-voorspeld = (netwerk2.predict(X_test_s, verbose=0).ravel() > 0.5).astype(int)
-
-fig, ax = plt.subplots(figsize=(4.8, 4.2))
-ConfusionMatrixDisplay.from_predictions(
-    y_test, voorspeld, display_labels=["<=50K", ">50K"],
-    cmap="Blues", colorbar=False, ax=ax, values_format=",d")
-ax.set_xlabel("wat het netwerk zei"); ax.set_ylabel("wat het echt was")
-ax.set_title("Het netwerk op de testset", fontsize=11)
-plt.tight_layout(); plt.show()
-
-print(classification_report(y_test, voorspeld, target_names=["<=50K", ">50K"], digits=3))
-""")
-
-md(r"""
----
-
-**Schalen is voor een netwerk verplicht.** Een boom kijkt naar "groter of kleiner dan"; een
-netwerk vermenigvuldigt en telt op, en dan verpletteren grote getallen de kleine.
-
-**Overfitting zie je in de grafiek gebeuren.** De trainlijn die blijft dalen terwijl de
-validatielijn omhoog kruipt — dat beeld moet je herkennen.
-
-**Ingewikkelder is niet beter.** Op deze data verslaan zowel de beslisboom als het random
-forest het neurale netwerk. Dat weet je alleen omdat je de eenvoudige modellen eerst gebouwd
-hebt.
-
-> In **topic 2** vragen we aan deze modellen *waarom* ze iets voorspellen.
 """)
 
 nb["cells"]=cells
