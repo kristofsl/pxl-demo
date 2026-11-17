@@ -1,15 +1,15 @@
 # Topic 4 — Gezichtsherkenning
 
-Een werkend gezichtsherkenningssysteem bouwen zonder zelf een gezichtsmodel te trainen —
-en onderweg **transfer learning** en **contrastive learning** leren.
+Van twee foto's bepalen of daar dezelfde persoon op staat, zonder zelf een gezichtsmodel te
+trainen — en onderweg **transfer learning** en **contrastive learning** leren.
 
 | | |
 |---|---|
 | **Notebook** | [`gezichtsherkenning.ipynb`](gezichtsherkenning.ipynb) |
 | **Dataset** | LFW: 16 personen × 40 foto's, lokaal gecacht |
 | **Geleend** | MTCNN (detectie) · FaceNet (embeddings) |
-| **Zelf gebouwd** | 3 Keras-modellen: classifier, triplet-hoofd, pairwise vergelijker |
-| **Duur** | ~3 uur les · notebook draait volledig in ± 90 seconden |
+| **Zelf gebouwd** | 1 Keras-model: een vergelijker die twee embeddings tegen elkaar houdt |
+| **Duur** | ~2 uur les · notebook draait volledig in ± 65 seconden |
 | **Voorkennis** | Python, numpy, basis machine learning. Keras is een plus, geen vereiste. |
 
 ---
@@ -66,12 +66,11 @@ De tweede stap haalt LFW op, knipt er 16 personen uit en zet die als JPEG's in
 Dat is het leukste deel van de les, en het kost niets:
 
 1. Maak een map `data/mijn-gezichten/Jouw_Naam/`
-2. Sleep er een stuk of vijf foto's in (JPEG of PNG, gezicht duidelijk in beeld)
+2. Zet er minstens **twee** foto's van jezelf in (JPEG of PNG, gezicht duidelijk in beeld)
 3. Draai §8 opnieuw
 
-Zonder eigen foto's werkt de notebook ook — dan doet §8 alsof een testfoto je upload is.
-Wil je dat het model je écht herkent, zet je map dan in `data/gezichten/` en draai alles
-opnieuw: je wordt dan gewoon persoon 17.
+Er hoeft niets hertraind te worden: §8 vergelijkt gewoon twee foto's. Zet je ook een map van
+een huisgenoot erbij, dan kun je meteen testen of het systeem jullie uit elkaar houdt.
 
 ---
 
@@ -81,37 +80,41 @@ opnieuw: je wordt dan gewoon persoon 17.
 |---|---|
 | 1–2 | De foto's, en **MTCNN**: bounding boxes, landmarks, en hoeveel gezichten hij mist |
 | **3** | **FaceNet**: van gezicht naar 512 getallen — uitgetekend, met de embedding van drie foto's naast elkaar |
-| 4 | De embeddingruimte verkennen: afstanden, histogram, 2D-projectie |
-| **5** | **Ons eigen classifiermodel** in Keras — plus: hoeveel foto's heb je nodig? |
-| **6** | **Contrastive learning**: triplet loss, zelf geschreven — mét een tekening van de siamese architectuur |
-| **7** | **De pairwise vergelijker**: laat het model de meetlat zélf leren — ook uitgetekend |
-| 8 | Je eigen foto door de hele pijplijn |
+| **4** | **Contrastive learning**: waarom die 512 getallen überhaupt iets betekenen. Triplet loss, de siamese opzet, en waarom een gewone classifier het minder goed doet. Alleen uitleg — we trainen hier niets |
+| 5 | De embeddingruimte verkennen: afstanden, histogram, 2D-projectie |
+| 6 | **De nullijn**: een eerlijke testopstelling, en verificatie met niets anders dan een drempel op de afstand |
+| **7** | **Ons eigen netwerk op het verschil** — en de waarschuwing die erbij hoort |
+| 8 | Je eigen foto: is dit dezelfde persoon? |
 
 ### De rode draad
 
 ```
-foto ──► [MTCNN] ──► [FaceNet] ──► [ons Keras-model] ──► naam
-         geleend      geleend       zelf geschreven
+foto A ──┐
+         ├──► [MTCNN] ──► [FaceNet] ──► vergelijken ──► zelfde persoon?
+foto B ──┘    geleend      geleend      §6 vast / §7 geleerd
 ```
 
-Stap 1 en 2 lenen we. Stap 3 is van ons, en dat is precies het stuk dat het voor *jouw*
-gezichten laat werken.
+Detecteren en embedden lenen we. Het enige wat wij trainen is de **vergelijking** — en §6 laat
+zien hoe ver je komt zonder zelfs dat te doen.
 
 ### Wat de notebook uitrekent
 
 | | |
 |---|---|
 | MTCNN mist | **0** van de 640 gezichten |
-| Classifier met 1 foto per persoon | ruim **90%** accuracy · met 2 foto's al 98% |
-| Classifier met 70% van de foto's | **97,9%** op 192 testgezichten |
+| Gekozen drempel op de cosinusafstand (§6) | **0,53**, bepaald op de trainfoto's |
+| Daarmee, op ongeziene personen | 95,5% van de gelijke paren herkend · 99,6% van de ongelijke afgewezen |
 
 Verificatie (zijn dit twee foto's van dezelfde persoon?), AUC:
 
 | aanpak | bekende personen | ongeziene personen | snel doorzoekbaar |
 |---|---|---|---|
 | FaceNet + cosinus, niets getraind | 0,972 | 0,979 | ja |
-| ons triplet-hoofd (64 dim) | 0,987 | 0,977 | ja |
-| **onze pairwise vergelijker** | **0,992** | **0,991** | nee |
+| **onze vergelijker** | **0,992** | **0,992** | nee |
+
+"Ongeziene personen" zijn vier mensen die in geen enkele trainingsstap voorkomen. Dat de
+vergelijker ook daar wint, laat zien dat hij geen gezichten uit het hoofd heeft geleerd maar
+echt beter is gaan vergelijken.
 
 ---
 
@@ -120,33 +123,32 @@ Verificatie (zijn dit twee foto's van dezelfde persoon?), AUC:
 - **§2** — de teller "geen gezicht gevonden: 0". Een detector die stilletjes rijen laat vallen
   is een klassieke bron van stille fouten. Laat de klas bedenken wanneer MTCNN het wél moeilijk
   krijgt (zonnebril, profiel, slecht licht) en test het met eigen foto's.
-- **§5** — de few-shot-curve. Eén foto per persoon en je zit boven de 90%. Vraag de klas te
-  schatten hoeveel foto's een netwerk vanaf nul nodig zou hebben.
 - **§3** — de tekening van de embedding: één gezicht, één streepjespatroon van 512 getallen.
   Daaronder drie foto's naast elkaar (twee keer dezelfde persoon, één keer iemand anders) zodat
   studenten zelf zien dat het patroon overeenkomt. Dat maakt "embedding" concreet.
-- **§6** — de architectuurtekening. Grijs is bevroren (FaceNet), oranje leert (ons hoofd), en
-  de streepjeslijn eromheen zegt: dit is **één** netwerk, drie keer gebruikt. Vraag de klas
-  waarom die gewichten gedeeld moeten zijn. Antwoord: anders meet je met drie meetlatten.
-- **§6** — de tekening van triplet loss (trekken en duwen) en de verliesfunctie die we zelf
-  schrijven. Merk op dat het verlies naar nul zakt: de meeste triplets zijn te makkelijk.
-  Dat is de opstap naar *hard negative mining*.
-- **§6 slot** — het triplet-hoofd wint bij bekende personen maar **verliest licht** bij
-  ongeziene. Specialiseren kost algemeenheid; dat is geen bug maar de afweging zelf.
-- **§7** — de vergelijkingstabel. De pairwise MLP wint op nauwkeurigheid, maar kan niet in een
+- **§4** — de siamese tekening. Vraag de klas eerst hoeveel netwerken ze zien. Antwoord: één.
+  Daarna de vervolgvraag: waarom móéten die gewichten gedeeld zijn? Omdat je anders met drie
+  verschillende meetlatten meet en afstand tussen de uitvoeren nergens op slaat.
+- **§4** — het berekende verlies komt op **0,000** uit. Dat is geen fout maar de kern: deze
+  triplet zit al goed, dus er valt niets te leren. Opstap naar *hard negative mining*.
+- **§4 slot** — "had het ook met een gewone classifier gekund?" Goede discussie over waarom je
+  model moet afgerekend worden op wat je echt wil weten.
+- **§6** — de drempel wordt op de **trainfoto's** gekozen, niet op de testfoto's. Vraag waarom.
+  Dit is dezelfde fout die studenten in hun eigen projecten het vaakst maken.
+- **§7 slot** — "De waarschuwing". De vergelijker wint op nauwkeurigheid maar kan niet in een
   vectordatabase. Laat de klas kiezen voor twee scenario's: een toegangspoort (één-op-één) en
-  zoeken in een miljoen gezichten.
+  zoeken in een miljoen gezichten. En noteer dat LFW uit scherpe persfoto's bestaat: op
+  camerabeelden zakken beide getallen fors.
 
 ### Knoppen om live mee te spelen
 
 | Waar | Variabele | Effect |
 |---|---|---|
 | §2 | `marge` in `knip_gezicht()` | strakker of ruimer uitknippen |
-| §5 | de lijst `[1, 2, 3, 5, 10, 20]` | few-shot-curve fijner maken |
-| §6 | `marge` in `triplet_verlies()` | hoeveel ruimte eist het model tussen de klassen |
-| §6 | `dim_uit` van het projectiehoofd | 32, 64, 128 — hoever kun je comprimeren? |
+| §4 | `marge` in de verliesberekening | hoeveel ruimte zou het model eisen tussen de klassen |
+| §6 | `DREMPEL` | strenger of soepeler: minder vals alarm, maar ook minder treffers |
 | §7 | de lagen van `maak_vergelijker()` | expressiever of juist kleiner |
-| §8 | `drempel` in `herken_met_twijfel()` | wanneer zegt het systeem "onbekend"? |
+| §7 | het aantal paren (40 000) | hoeveel voorbeelden heeft de vergelijker nodig? |
 
 ---
 
@@ -157,9 +159,8 @@ Verificatie (zijn dit twee foto's van dezelfde persoon?), AUC:
 | `FileNotFoundError: Foto's niet gevonden` | Je bent `haal_data.py` vergeten. Zie stap 1. |
 | `ModuleNotFoundError: No module named 'tensorflow'` | Je draait de systeem-Jupyter. Start via `.venv/bin/jupyter lab`. |
 | Eerste run is traag | De modelgewichten worden eenmalig gedownload. Daarna gecacht. |
-| Rommelige `lz4`-meldingen bij het afsluiten | Onschuldig; komt uit het inladen van de FaceNet-gewichten. |
 | Jouw foto geeft "geen gezicht gevonden" | Gezicht te klein, te schuin of te donker. Probeer een foto waarop je gezicht minstens 100 pixels breed is. |
-| Jouw foto wordt als iemand anders herkend | Logisch: de classifier kent maar 16 personen en kiest altijd één daarvan. §8 laat zien hoe je dat oplost met een drempel. |
+| Twee foto's van jezelf worden "andere persoon" | Kijk naar de afstand: zit die net boven de drempel, dan is de foto waarschijnlijk te schuin of te donker. Een drempel is altijd een afweging. |
 
 ## Getest met
 
