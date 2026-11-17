@@ -35,6 +35,14 @@ import warnings, os
 warnings.filterwarnings("ignore")
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"      # TensorFlow wat stiller maken
 
+# MTCNN laadt zijn gewichten uit .lz4-bestanden. Door een bug in die bibliotheek
+# wordt zo'n bestand bij het sluiten nog "geflusht" alsof erin geschreven is,
+# terwijl het alleen gelezen werd. Dat geeft drie rode maar onschuldige
+# foutblokken. We laten flush() alleen nog iets doen bij schrijven.
+import lz4.frame
+_lz4_flush = lz4.frame.LZ4FrameFile.flush
+lz4.frame.LZ4FrameFile.flush = lambda self: _lz4_flush(self) if self.writable() else None
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
