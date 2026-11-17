@@ -416,28 +416,21 @@ plt.show()
 md(r"""
 ### Is dat dan een siamees netwerk?
 
-Ja — maar dat woord belooft meer dan het is. Een siamees netwerk is **geen apart soort
-netwerk**. Het is één heel gewoon netwerk, dat je tijdens het trainen gewoon meerdere keren
-achter elkaar gebruikt, op de drie foto's van je triplet.
-
-Er is dus ook maar **één set gewichten**. De "drie takken" die je in tekeningen ziet, zijn
-driemaal dezelfde doos. In Keras is dat letterlijk:
+Ja, maar het is geen apart soort netwerk. Het is één gewoon netwerk dat je per triplet
+drie keer gebruikt — dus **één set gewichten**. In Keras letterlijk:
 
 ```python
-basis = maak_netwerk()        # één model
+basis = maak_netwerk()
 
 uit_a = basis(anker)          # dezelfde gewichten
 uit_p = basis(positief)       # dezelfde gewichten
 uit_n = basis(negatief)       # dezelfde gewichten
 ```
 
-Dat het hetzelfde object is, ís de hele truc. Zou je drie losse netwerken nemen, dan zouden
-hun uitvoeren in verschillende ruimtes liggen en zou afstand tussen die uitvoeren nergens op
-slaan.
-
-Waar zit het verschil met gewone training dan wél? **In de verliesfunctie.** Normaal is dat
-`verlies(uitvoer, label)`: één uitvoer, één juist antwoord. Hier is het
-`verlies(uitvoer_a, uitvoer_p, uitvoer_n)`: drie uitvoeren en geen juist antwoord, alleen de
+Dat het hetzelfde object is, ís de truc: drie losse netwerken zouden in drie verschillende
+ruimtes uitkomen en dan slaat afstand nergens op. Het verschil met gewone training zit dus
+niet in de lagen maar in de **verliesfunctie**: niet `verlies(uitvoer, label)` maar
+`verlies(uitvoer_a, uitvoer_p, uitvoer_n)` — drie uitvoeren en geen juist antwoord, alleen de
 eis dat ze onderling goed liggen.
 """)
 
@@ -537,19 +530,11 @@ zoveel data nodig heeft.
 
 ### Had het ook met een gewone classifier gekund?
 
-Dat is geprobeerd, en het werkt half. Je traint een netwerk om duizenden bekende personen te
-classificeren, en gebruikt daarna de **voorlaatste laag** als embedding. De oudere
-DeepFace-aanpak deed precies dat.
-
-Twee problemen. Ten eerste moet je uitvoerlaag even breed zijn als je aantal personen — bij
-een miljoen identiteiten is dat onwerkbaar. Ten tweede, en belangrijker: zo'n netwerk wordt
-alleen afgerekend op het **uit elkaar houden van de klassen die het kent**. Dat die ruimte
-daarbuiten ook nog netjes geordend is, is meegenomen maar wordt nergens afgedwongen.
-
-Contrastive learning rekent het model wél direct af op wat we uiteindelijk willen weten:
-liggen twee foto's van dezelfde persoon dichter bij elkaar dan twee foto's van verschillende
-personen? Daardoor werkt het ook op mensen die nooit in de training zaten — en dat is wat we
-in §6 gaan uitbuiten.
+Half. Je kunt duizenden personen classificeren en daarna de **voorlaatste laag** als
+embedding gebruiken — zo deed de oudere DeepFace-aanpak het. Maar zo'n netwerk wordt alleen
+afgerekend op het uit elkaar houden van de klassen die het kent; dat de ruimte daarbuiten ook
+klopt, wordt nergens afgedwongen. Contrastive learning rekent wél direct af op de vraag die we
+straks stellen, en werkt daarom ook op mensen die nooit in de training zaten.
 """)
 
 md(r"""
@@ -673,30 +658,14 @@ print(f"foto's ongeziene personen   : {is_ongezien.sum()}")
 """)
 
 md(r"""
-Verificatie gaat over **paren**, niet over losse foto's. Eén functie die uit een groep foto's
-alle paren maakt en vraagt hoe goed een score "zelfde persoon" van "andere persoon"
-onderscheidt. Die functie gebruiken we straks ook voor ons eigen model, zodat de vergelijking
-eerlijk blijft.
+Verificatie gaat over **paren**, niet over losse foto's. Dezelfde functie gebruiken we straks
+voor ons eigen model, zodat de vergelijking eerlijk blijft.
 
 Als maat nemen we de **AUC**: de kans dat een willekeurig gelijk paar een betere score krijgt
-dan een willekeurig ongelijk paar. 1,0 is perfect, 0,5 is muntje opgooien.
-
-**En nee, daar heb je geen kansen voor nodig.** AUC wordt meestal getoond bij een classifier
-die netjes iets tussen 0 en 1 uitspuugt, en daardoor denk je al snel dat dat een eis is. Dat
-is het niet. Wat binair moet zijn is het *juiste antwoord* — zelfde persoon: ja of nee. De
-score mag elk getal zijn, want de ROC-curve schuift gewoon een drempel over alle waarden die
-voorkomen en kijkt alleen naar de **volgorde**.
-
-Daarom kunnen we hier de kale cosinus invoeren, die van -1 tot 1 loopt. Zet er een sigmoid
-overheen en je krijgt exact dezelfde AUC: elke bewerking die de volgorde intact laat,
-verandert niets.
-
-Eén ding moet wel kloppen: **hoger moet "waarschijnlijker dezelfde persoon" betekenen.**
-Daarom voeren we de similariteit in en niet de afstand. Met afstand zou je `-afstand` moeten
-nemen, anders meet je 1 - AUC.
-
-Dat is meteen waarom we in §7 de cosinus (-1 tot 1) en ons eigen netwerk (0 tot 1) in dezelfde
-tabel mogen zetten: AUC kijkt niet naar de schaal, alleen naar de rangschikking.
+dan een willekeurig ongelijk paar. 1,0 is perfect, 0,5 is muntje opgooien. Die score hoeft
+geen kans te zijn — AUC kijkt alleen naar de volgorde. Daarom mag de kale cosinus (-1 tot 1)
+er net zo goed in als straks een kans (0 tot 1) uit ons eigen netwerk. Hoger moet wel
+"waarschijnlijker dezelfde persoon" betekenen; vandaar similariteit en geen afstand.
 """)
 
 code(r"""
@@ -800,19 +769,12 @@ md(r"""
 
 ## 7. Ons eigen netwerk op het verschil
 
-De nullijn staat. Nu zetten we er zelf iets tussen.
-
-Tot hier hielden we de **meetlat vast**: cosinusafstand, een vaste formule die elk van de 512
-getallen even zwaar weegt. Maar waarom zou dat de beste manier zijn om twee gezichten te
-vergelijken? Misschien zijn sommige van die 512 richtingen veel betekenisvoller dan andere.
-Misschien doet een combinatie van twee richtingen er meer toe dan elk apart.
-
-Dat kunnen we laten uitzoeken. We trainen een klein netwerk dat **twee embeddings
-binnenkrijgt** en zegt: *"zelfde persoon: ja of nee."* De embeddings van FaceNet laten we
-precies zoals ze zijn — we leren alleen de vergelijking.
-
-Dat is een erkende techniek: een **learned metric** of verificatienetwerk. De Siamese
-one-shot-paper van Koch (2015) doet precies dit.
+Tot hier hielden we de meetlat vast: cosinusafstand weegt elk van de 512 getallen even zwaar.
+Maar misschien zijn sommige richtingen veel betekenisvoller dan andere. Dat kunnen we laten
+uitzoeken: we trainen een klein netwerk dat **twee embeddings binnenkrijgt** en zegt "zelfde
+persoon: ja of nee". De embeddings zelf laten we met rust — we leren alleen de vergelijking.
+Zo'n **learned metric** is een erkende techniek; de Siamese one-shot-paper van Koch (2015)
+doet precies dit.
 
 ### Hoe voer je twee vectoren in één netwerk?
 
@@ -972,21 +934,18 @@ display(overzicht)
 md(r"""
 ### De waarschuwing
 
-Onze vergelijker wint op beide kolommen, ook bij de vier personen die hij nooit gezien heeft.
-Hij heeft dus niet onze zestien mensen uit zijn hoofd geleerd — hij heeft echt een betere
-manier van vergelijken geleerd, en die generaliseert.
+Hij wint op beide kolommen, ook bij de vier personen die hij nooit gezien heeft. Hij heeft
+dus geen gezichten uit zijn hoofd geleerd maar echt beter leren vergelijken.
 
-Toch is "beter" hier niet hetzelfde als "altijd de betere keuze". Kijk naar de laatste kolom.
+Toch is "beter" hier niet "altijd de betere keuze". Kijk naar de laatste kolom.
 
-**Met cosinusafstand is een embedding een adres.** Je rekent elk gezicht één keer uit, slaat
-die 512 getallen op, en vergelijken is daarna één vermenigvuldiging. Een miljoen gezichten in
-een vectordatabase doorzoeken kost milliseconden, want zo'n database kan op afstand
-indexeren — hij weet dat punten die ver van elkaar liggen niet eens bekeken hoeven te worden.
+**Met cosinusafstand is een embedding een adres**: één keer uitrekenen, opslaan, en
+vergelijken is daarna één vermenigvuldiging. Een vectordatabase kan daarop indexeren en weet
+dat verre punten niet eens bekeken hoeven te worden.
 
-**Bij onze vergelijker bestaat die afstand niet meer.** Er is geen getal dat je vooraf kunt
-uitrekenen en opslaan, want het oordeel ontstaat pas op het moment dat je twee gezichten
-samen door het netwerk duwt. Eén gezicht tegen een miljoen andere houden betekent dus: een
-miljoen keer het netwerk draaien. Er valt niets te indexeren en niets over te slaan.
+**Bij onze vergelijker bestaat die afstand niet meer.** Het oordeel ontstaat pas als je twee
+gezichten sámen door het netwerk duwt, dus één gezicht tegen een miljoen houden betekent een
+miljoen keer het netwerk draaien.
 
 | | cosinusafstand | onze vergelijker |
 |---|---|---|
@@ -996,17 +955,12 @@ miljoen keer het netwerk draaien. Er valt niets te indexeren en niets over te sl
 | Zoeken in een grote database | snel (vectorindex) | traag (N keer het model draaien) |
 | Typisch gebruikt voor | zoeken, clusteren, aanbevelen | één-op-één verifiëren |
 
-**De praktijkregel die hieruit volgt:** moet je zóéken in een grote verzameling — wie van onze
-tienduizend klanten is dit? — dan wil je een embedding en een vaste afstandsmaat, ook al is
-die iets minder nauwkeurig. Moet je twee dingen vergelijken die je toch al in handen hebt —
-een selfie tegen de pasfoto op je identiteitskaart, een vingerafdruk tegen die ene opgeslagen
-afdruk — dan is een vergelijker prima, en meestal beter.
+**Praktijkregel:** moet je zóéken in een grote verzameling, neem een embedding met een vaste
+afstandsmaat, ook al is die iets minder nauwkeurig. Heb je de twee dingen al in handen — een
+selfie tegen de pasfoto op je identiteitskaart — dan is een vergelijker beter.
 
-Nog een tweede kanttekening, want AUC's van 0,99 zien er mooier uit dan ze zijn. LFW bestaat
-uit persfoto's van publieke figuren: scherp, van voren, goed belicht. Zet dit op beelden van
-een bewakingscamera en beide getallen zakken fors. Wat je hier ziet is dat de vergelijker
-beter is **dan de cosinusafstand op deze data** — niet dat gezichtsverificatie een opgelost
-probleem is.
+En wees voorzichtig met die 0,99: LFW bestaat uit scherpe persfoto's van voren. Op
+camerabeelden zakken beide getallen fors.
 """)
 
 md(r"""
