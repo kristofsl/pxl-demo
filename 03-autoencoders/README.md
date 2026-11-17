@@ -76,10 +76,7 @@ een leslokaal is geen afhankelijkheid die je wil hebben.
 | **2** | **Wat is een autoencoder** — met een tekening van de flessenhals, en waarom je hem op *normale* data traint |
 | 3 | Data klaarmaken: splitsen, schalen, en de fraude uit de trainset gooien |
 | 4 | Het netwerk bouwen en trainen (PyTorch, 30 epochs, ~5 seconden) |
-| **5** | **De reconstructiefout als score** — de histogramplot, ROC-AUC vs PR-AUC |
-| **6** | **Een drempel kiezen** — en zien wat die keuze kost in gemiste fraude en vals alarm |
-| **7** | **Was het netwerk nodig?** — vergelijking met PCA en IsolationForest |
-| 8 | Waarom werd déze transactie gemarkeerd? (fout per feature) |
+| **5** | **De reconstructiefout als score** — en de histogramplot waarop je ziet dat de staarten overlappen |
 
 ### De kern in één zin
 
@@ -92,8 +89,7 @@ fraudepatronen oppikken die nog nooit eerder gezien zijn.
 | | |
 |---|---|
 | Fraude reconstrueert | **33× slechter** dan normaal (mediaan) |
-| ROC-AUC / PR-AUC | 0,942 / **0,626** (willekeurig raden: 0,5 / 0,008) |
-| Bij drempel op p99 | 121 van de 148 fraudegevallen gevonden, 191 valse alarmen |
+| Mediane fout, normaal versus fraude | 0,35 tegenover 11,3 |
 
 ---
 
@@ -105,12 +101,8 @@ fraudepatronen oppikken die nog nooit eerder gezien zijn.
   flessenhals nutteloos zou zijn (antwoord: dan kopieert hij gewoon de invoer).
 - **§5** — het histogram met de overlappende staarten. Dit is dé plaat: er is geen drempel die
   alles goed doet.
-- **§6** — de drempeltabel. Laat de klas kiezen alsof ze de fraudeafdeling runnen: 25 analisten
-  of 2? Dat is geen technische vraag.
-- **§7** — hier verliest de autoencoder van PCA op ROC-AUC en wint hij op PR-AUC. Uitstekend
-  moment om te bespreken waarom je je maat vooraf kiest, en waarom je altijd met een simpele
-  baseline begint.
-- **§8** — de brug naar topic 2: van een score naar een uitleg.
+- **§5** — vraag de klas waar zij de grens zouden leggen in dat histogram. Elke keuze laat
+  fraude door of levert vals alarm op; er is geen drempel die allebei vermijdt.
 
 ### Knoppen om live mee te spelen
 
@@ -118,8 +110,6 @@ fraudepatronen oppikken die nog nooit eerder gezien zijn.
 |---|---|---|
 | §4 | de `8` in de flessenhals | smaller = grovere samenvatting; probeer 2, 4, 14 |
 | §4 | `range(30)` (epochs) | ondertraind vs uitgetraind |
-| §6 | `DREMPEL` | schuif langs de precision-recall-afweging |
-| §8 | `gepakt` | een andere transactie ontleden |
 
 ---
 

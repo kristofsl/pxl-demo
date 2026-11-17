@@ -46,15 +46,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-# --- scikit-learn: voorbewerking, baselines, evaluatie ---
+# --- scikit-learn: voorbewerking ---
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
-from sklearn.ensemble import IsolationForest
-from sklearn.metrics import (
-    roc_auc_score, average_precision_score, roc_curve, precision_recall_curve,
-    precision_recall_fscore_support, confusion_matrix, ConfusionMatrixDisplay,
-)
 
 # --- het model ---
 import torch
@@ -366,53 +360,6 @@ ax.set_title("Fraude zit rechts — maar de staarten overlappen", fontsize=11)
 ax.legend()
 plt.tight_layout()
 plt.show()
-""")
-
-code(r"""
-X_train_n = scaler.transform(X_train[y_train == 0])
-X_test_s  = scaler.transform(X_test)
-
-# --- baseline 1: PCA met evenveel componenten als onze flessenhals ---
-pca = PCA(n_components=8, random_state=RANDOM_STATE).fit(X_train_n)
-heropgebouwd = pca.inverse_transform(pca.transform(X_test_s))
-fout_pca = ((X_test_s - heropgebouwd) ** 2).mean(axis=1)
-
-# --- baseline 2: IsolationForest, ook alleen op normale transacties ---
-iso = IsolationForest(n_estimators=200, random_state=RANDOM_STATE).fit(X_train_n)
-score_iso = -iso.score_samples(X_test_s)      # min-teken: hoger = vreemder
-
-vergelijking = pd.DataFrame([
-    {"methode": "Autoencoder (8)", "ROC-AUC": roc_auc_score(y_test, fout_test),
-     "PR-AUC": average_precision_score(y_test, fout_test)},
-    {"methode": "PCA (8)", "ROC-AUC": roc_auc_score(y_test, fout_pca),
-     "PR-AUC": average_precision_score(y_test, fout_pca)},
-    {"methode": "IsolationForest", "ROC-AUC": roc_auc_score(y_test, score_iso),
-     "PR-AUC": average_precision_score(y_test, score_iso)},
-    {"methode": "willekeurig raden", "ROC-AUC": 0.5, "PR-AUC": y_test.mean()},
-]).set_index("methode").round(4)
-
-display(vergelijking)
-""")
-
-md(r"""
-### Kijk goed naar die tabel
-
-Er staat iets ongemakkelijks in: **op ROC-AUC verliest de autoencoder van allebei de
-eenvoudige baselines.** Op PR-AUC wint hij juist duidelijk.
-
-Dat is geen foutje, en het is de belangrijkste les van deze sectie. De twee maten stellen een
-andere vraag, en bij 0,8% fraude is PR-AUC de vraag die je echt interesseert: *van de alarmen
-die ik afga, hoeveel zijn er terecht?* ROC-AUC laat zich makkelijk vleien door de 59.000
-normale transacties die iedereen wel goed classificeert.
-
-De eerlijke conclusie is dus tweeledig:
-
-- **Begin altijd met de simpele baseline.** PCA kost één regel en komt hier verrassend dichtbij.
-  Kun je dat niet verslaan, dan heb je je antwoord.
-- **Kies je maat vóórdat je de modellen vergelijkt.** Anders kies je achteraf de maat waarmee
-  jouw favoriete model wint, en dat is geen onderzoek meer.
-
----
 """)
 
 nb["cells"] = cells
