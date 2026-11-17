@@ -59,63 +59,63 @@ Daarna heeft de notebook geen internet meer nodig.
 
 ## Inhoud van de notebook
 
+Eén voorspelling, van begin tot eind uitgewerkt. Niet meer en niet minder.
+
 | § | Onderwerp |
 |---|---|
-| 1 | De data, en de **drie**-weg-split: train · kalibratie · test |
-| 2 | Waarom "97% zeker" van een softmax geen garantie is |
-| **3** | **Conformal in vier stappen** — meten, sorteren, grens, toepassen (met tekening) |
-| **4** | **Klopt de garantie?** Beloofd versus gemeten, bij vier niveaus — en waarom 94,8% géén mislukking is |
-| **5** | **De werkstroom**: wat automatiseren we, en wat gaat naar een mens? |
-| 6 | Waar twijfelt het model over? De verwarringsparen, in beeld |
+| 1 | Data en model, met de **drie**-weg-split: train · kalibratie · test |
+| 2 | Wat het model zegt over één cijfer — en waarom dat percentage geen belofte is |
+| **3** | **Kalibreren**: hoe ver zit het model er normaal naast, en waar leg je de grens? |
+| **4** | **De verzameling** voor die ene voorspelling, cijfer voor cijfer opgebouwd |
+| 5 | Klopt de belofte? Beloofd naast gemeten op 14.000 testcijfers |
 
-### Het idee in één zin
+### Het voorbeeld
 
-> Kijk op je kalibratiedata hoe ver het model er normaal naast zit, en gebruik die
-> gebruikelijke misser als marge voor nieuwe voorspellingen.
-
-Geen formules, geen aannames over je data, geen hertraining. Het werkt op elk model — ook op
-een black box van een leverancier — en het kost ongeveer vijf regels code.
-
-### Wat de notebook uitrekent
+Het gekozen cijfer is met opzet een lastig geval:
 
 | | |
 |---|---|
-| Beloofde dekking | 95,0% |
-| Gemeten dekking op 14.000 testcijfers | **94,8%** |
-| Automatisch af te handelen (één label) | **86,9%**, waarvan 95,7% correct |
-| Naar een mens (twee of meer labels) | 13,1% |
-| Van alle modelfouten afgevangen | **59%** |
+| In werkelijkheid | een **4** |
+| Het model gokt | een **9**, met 80,2% zekerheid |
+| De verzameling | **{4, 9}** — het juiste antwoord zit erin |
 
-De verwarringsparen die het model zelf aanwijst: `{4,9}`, `{7,9}`, `{3,5}`, `{2,8}` — precies
-de cijfers die een mens ook door elkaar haalt.
+Daarmee staat de hele les in één voorbeeld: het model zit ernaast en klinkt er zeker bij, maar
+de verzameling vangt het op. Conformal prediction geeft je geen beter model, maar een eerlijker
+antwoord van hetzelfde model.
+
+| Beloofd | 95,0% |
+|---|---|
+| Gemeten op 14.000 testcijfers | **94,8%** |
+| Gemiddeld aantal antwoorden per verzameling | 1,15 |
+
+### Het idee in één zin
+
+> Kijk op apart gehouden data hoe ver het model er normaal naast zit, en gebruik die
+> gebruikelijke misser als marge.
+
+Geen formules, geen aannames over je data, geen hertraining. Het werkt op elk model — ook op
+een black box van een leverancier.
 
 ---
 
 ## Didactische aanknopingspunten
 
-- **§1** — de drie-weg-split. Vraag de klas waaróm de kalibratieset apart moet blijven. Dat het
-  model die nooit gezien heeft, is de hele basis van de garantie.
-- **§2** — de tabel met "model zegt X%, klopt in Y%". Dit model valt mee, en dat is juist het
-  punt: ook een redelijk gekalibreerd model geeft je geen *belofte*, en het roept altijd precies
-  één antwoord.
-- **§4** — beloofd naast gemeten, bij vier niveaus. Dit is het moment waarop conformal van
-  "aardig idee" naar "dit werkt gewoon" gaat.
-- **§4 slot** — de vraag die altijd komt: "94,8% is toch minder dan 95%?" De notebook meet het
-  met veertig verschillende kalibratiesets: het gemiddelde landt op 94,99% en ruim de helft van
-  de runs zit onder het doel. Dát is wat *marginale* dekking betekent, en het is de meest
-  gemaakte denkfout bij conformal prediction.
-- **§5** — de werkstroomtabel. Laat de klas een rij kiezen alsof zij de afdeling runnen. Wat
-  kost een fout, en wat kost een mens die meekijkt? Dat is geen technische vraag.
-- **§6** — de plaatjes van de twijfelgevallen. Laat studenten zelf kijken of ze het met de
-  verzameling eens zijn. Meestal wel, en dat maakt indruk.
+- **§1** — vraag waaróm de kalibratieset apart moet blijven. Dat het model die nooit gezien
+  heeft, is de hele basis van de garantie.
+- **§2** — het model gokt fout én zelfverzekerd. Goed moment om te vragen wat die 80% nu
+  eigenlijk waard is.
+- **§4** — de tabel met tien regels, waar je cijfer voor cijfer ziet wie de keuring haalt. Laat
+  de klas eerst zelf raden welke twee overblijven.
+- **§5** — beloofd naast gemeten. Dit is het moment waarop conformal van "aardig idee" naar
+  "dit werkt gewoon" gaat.
 
 ### Knoppen om live mee te spelen
 
 | Waar | Variabele | Effect |
 |---|---|---|
+| §2 | `i` | een ander cijfer uitwerken; 112, 125 en 144 zijn ook twijfelgevallen |
 | §3 | `ALPHA` | 0.20 tot 0.01: de hele afweging tussen garantie en vaagheid |
 | §1 | `train_size=2000` | een beter model → kleinere verzamelingen |
-| §1 | de grootte van de kalibratieset | hoe stabiel is de grens? |
 
 ---
 
