@@ -262,13 +262,6 @@ print("onderling vergelijkbaar.")
 print()
 print("Zo ziet één gezicht eruit als getallen (eerste 8 van de 512):")
 print(embeddings[0][:8].round(4))
-print()
-print("Die getallen zijn klein, en lengte 1 lijkt dan vreemd. Maar de lengte")
-print("is niet de grootte van één getal: het is de wortel van de som van alle")
-print("512 kwadraten. Lagen ze allemaal even ver van nul, dan was elk getal")
-print(f"1/wortel(512) = {1/np.sqrt(512):.4f}. Even narekenen:")
-print(f"  som van alle kwadraten : {(embeddings[0] ** 2).sum():.4f}")
-print(f"  wortel daarvan         : {np.sqrt((embeddings[0] ** 2).sum()):.4f}")
 """)
 
 md(r"""

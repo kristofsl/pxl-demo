@@ -110,9 +110,11 @@ Verificatie (zijn dit twee foto's van dezelfde persoon?), AUC:
 | aanpak | bekende personen | ongeziene personen | snel doorzoekbaar |
 |---|---|---|---|
 | FaceNet + cosinus, niets getraind | 0,972 | 0,979 | ja |
-| **onze vergelijker** | **0,992** | **0,992** | nee |
+| **onze vergelijker** | **~0,992** | **~0,991** | nee |
 
-"Ongeziene personen" zijn vier mensen die in geen enkele trainingsstap voorkomen. Dat de
+De vergelijker wordt opnieuw getraind bij elke run, dus die twee getallen schommelen een
+paar duizendsten. "Ongeziene personen" zijn vier mensen die in geen enkele trainingsstap
+voorkomen. Dat de
 vergelijker ook daar wint, laat zien dat hij geen gezichten uit het hoofd heeft geleerd maar
 echt beter is gaan vergelijken.
 
