@@ -590,7 +590,7 @@ print("transacties zich structureel anders gedragen - een patroon dat je aan een
 print("fraudeanalist kunt laten zien, in plaats van alleen een score.")
 """)
 nb["cells"] = cells
-nb["metadata"] = {"kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
+nb["metadata"] = {"kernelspec": {"display_name": "Python 3 (ipykernel)", "language": "python", "name": "python3"},
                   "language_info": {"name": "python", "pygments_lexer": "ipython3"}}
 nbf.write(nb, sys.argv[1])
 print(f"Notebook geschreven: {sys.argv[1]} ({len(cells)} cellen)")
