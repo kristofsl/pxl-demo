@@ -9,7 +9,7 @@ naar een mens?
 | **Notebook** | [`conformal-prediction.ipynb`](conformal-prediction.ipynb) |
 | **Dataset** | MNIST, 20.000 handgeschreven cijfers, lokaal gecacht |
 | **Model** | Klein neuraal netje (sklearn), bewust maar 90,8% accuraat |
-| **Duur** | ~2 uur les · notebook draait volledig in ± 10 seconden |
+| **Duur** | ~1 uur les · notebook draait volledig in ± 10 seconden |
 | **Voorkennis** | Python, basis machine learning. **Geen wiskunde nodig.** |
 
 ---
@@ -67,7 +67,6 @@ Eén voorspelling, van begin tot eind uitgewerkt. Niet meer en niet minder.
 | 2 | Wat het model zegt over één cijfer — en waarom dat percentage geen belofte is |
 | **3** | **Kalibreren**: hoe ver zit het model er normaal naast, en waar leg je de grens? |
 | **4** | **De verzameling** voor die ene voorspelling, cijfer voor cijfer opgebouwd |
-| 5 | Klopt de belofte? Beloofd naast gemeten op 14.000 testcijfers |
 
 ### Het voorbeeld
 
@@ -82,11 +81,6 @@ Het gekozen cijfer is met opzet een lastig geval:
 Daarmee staat de hele les in één voorbeeld: het model zit ernaast en klinkt er zeker bij, maar
 de verzameling vangt het op. Conformal prediction geeft je geen beter model, maar een eerlijker
 antwoord van hetzelfde model.
-
-| Beloofd | 95,0% |
-|---|---|
-| Gemeten op 14.000 testcijfers | **94,8%** |
-| Gemiddeld aantal antwoorden per verzameling | 1,15 |
 
 ### Het idee in één zin
 
@@ -106,8 +100,6 @@ een black box van een leverancier.
   eigenlijk waard is.
 - **§4** — de tabel met tien regels, waar je cijfer voor cijfer ziet wie de keuring haalt. Laat
   de klas eerst zelf raden welke twee overblijven.
-- **§5** — beloofd naast gemeten. Dit is het moment waarop conformal van "aardig idee" naar
-  "dit werkt gewoon" gaat.
 
 ### Knoppen om live mee te spelen
 

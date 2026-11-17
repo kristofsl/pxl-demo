@@ -228,38 +228,6 @@ else:
     print("model, maar een eerlijker antwoord van hetzelfde model.")
 """)
 
-md(r"""
-## 5. Klopt die belofte?
-
-We beloofden 95%. Dat is geen schatting maar iets wat je kunt natellen — op testdata die
-nergens in dit proces gebruikt is.
-""")
-
-code(r"""
-kansen_test = model.predict_proba(X_test)
-verzamelingen = (1 - kansen_test) <= grens          # per rij: welke cijfers doen mee
-
-zit_erin = verzamelingen[np.arange(len(y_test)), y_test]
-
-print(f"beloofd : {1 - ALPHA:.1%}")
-print(f"gemeten : {zit_erin.mean():.1%}   ({zit_erin.sum():,} van de {len(y_test):,} testcijfers)")
-print()
-print(f"Gemiddeld aantal antwoorden per verzameling: {verzamelingen.sum(axis=1).mean():.2f}")
-""")
-
-md(r"""
-Beloofd en gemeten lopen gelijk op, en daar hebben we niets voor hoeven doen: geen aannames
-over de data, geen hertraining, geen gepruts aan het model.
-
-> **Dat gemeten getal ligt net ónder de 95%, en dat hoort zo.** De belofte geldt gemiddeld over
-> kalibratiesets, niet voor elke losse set. Had je toevallig 4000 andere cijfers gekalibreerd,
-> dan was de grens iets anders uitgevallen en de dekking ook — soms een half procent erboven,
-> soms eronder.
-
-Wat het kost staat in dat laatste getal: gemiddeld meer dan één antwoord per verzameling. Dat
-is de ruil. Wil je een hardere garantie, zet `ALPHA` lager — en krijg je grotere verzamelingen
-terug. Zekerheid koop je met vaagheid.
-""")
 nb["cells"]=cells
 nb["metadata"]={"kernelspec":{"display_name":"Python 3 (ipykernel)","language":"python","name":"python3"},
                 "language_info":{"name":"python","pygments_lexer":"ipython3"}}
