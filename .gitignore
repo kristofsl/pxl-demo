@@ -17,3 +17,6 @@ __pycache__/
 *.swp
 *.swo
 *~
+
+# logs van start-alles.sh
+.logs/

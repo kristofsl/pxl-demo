@@ -66,4 +66,6 @@ echo
 
 # --port-retries=0: als de poort bezet is, stoppen met een foutmelding in plaats
 # van stilletjes een andere poort te kiezen. Anders klopt het overzicht niet meer.
-exec .venv/bin/jupyter lab --port="$POORT" --port-retries=0 "$NOTEBOOK"
+# JUPYTER_EXTRA laat start-alles.sh er --no-browser aan toevoegen, zodat je bij
+# vijf tegelijk niet vijf tabbladen tegelijk in je gezicht krijgt.
+exec .venv/bin/jupyter lab --port="$POORT" --port-retries=0 ${JUPYTER_EXTRA:-} "$NOTEBOOK"

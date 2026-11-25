@@ -162,7 +162,8 @@ echo
 echo "--> JupyterLab opent op http://localhost:\$POORT"
 echo "    Stoppen doe je met Ctrl-C in dit venster."
 echo
-exec .venv/bin/jupyter lab --port="\$POORT" --port-retries=0 "\$NOTEBOOK"
+# JUPYTER_EXTRA laat start-alles.sh er --no-browser aan toevoegen.
+exec .venv/bin/jupyter lab --port="\$POORT" --port-retries=0 \${JUPYTER_EXTRA:-} "\$NOTEBOOK"
 START
 chmod +x "$DOEL/start.sh"
 

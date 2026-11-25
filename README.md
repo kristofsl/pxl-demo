@@ -16,8 +16,24 @@ ander breken, en kan een student één map downloaden en meteen aan de slag.
 
 ## Snel starten
 
-Elk topic heeft een `start.sh` die alles doet: virtual environment aanmaken, pakketten
-installeren, data ophalen en JupyterLab openen.
+### Alles tegelijk
+
+```bash
+./start-alles.sh
+```
+
+Start elk topic op zijn eigen poort en zet daarna het overzicht met links op je scherm.
+Topics die al draaien worden met rust gelaten. Stoppen doe je met Ctrl-C in datzelfde
+venster, of van elders met:
+
+```bash
+./start-alles.sh stop
+```
+
+### Eén topic
+
+Elk topic heeft ook een eigen `start.sh` die alles doet: virtual environment aanmaken,
+pakketten installeren, data ophalen en JupyterLab openen.
 
 ```bash
 cd 01-eerste-model && ./start.sh
@@ -33,8 +49,8 @@ cd 01-eerste-model && ./start.sh
 | 4 — Gezichtsherkenning | 8884 | http://localhost:8884 |
 | 5 — Conformal prediction | 8885 | http://localhost:8885 |
 
-Stoppen doe je met Ctrl-C in het venster waar je het script startte. De eerste keer duurt het
-installeren even; daarna staat JupyterLab er binnen enkele seconden.
+De eerste keer duurt het installeren even; daarna staat JupyterLab er binnen enkele seconden.
+`start-alles.sh` schrijft per topic een log in `.logs/`, voor als er eentje niet opkomt.
 
 Liever met de hand? Elke topicmap heeft een eigen `README.md` met de losse stappen.
 
